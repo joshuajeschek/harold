@@ -1,13 +1,20 @@
-const Discord = require('discord.js');
+const Commando = require('discord.js-commando');
+const path = require('path');
+const sqlite = require('sqlite');
+const sqlite3 = require('sqlite3');
 const { exit } = require('process');
+
 const config = require('../config.json');
-const client = new Discord.Client();
-const PREFIX = config.discord.prefix;
+
+const dc_client = new Commando.Client({
+    owner: config.discord.owner,
+    commandPrefix: config.discord.prefix
+});
 
 
 /**
  * Logs the client in, depending on command line arguments
- * @param {Discord.Client} dc_client the client to log in
+ * @param {Commando.Client} dc_client the client to log in
  */
 function logIn(dc_client) {
     if (process.argv.length < 2) {
@@ -25,26 +32,35 @@ function logIn(dc_client) {
     }
 };
 
-/* Logs if bot is ready */
-client.on('ready', () => {
-    console.log(`✅ Logged in as ${client.user.tag}!`);
-    client.user.setActivity('Counter-Strike: Global Offensive', {'type': 'PLAYING'});
-});
+/**
+ * Sets up the client (registry, database)
+ * @param {Commando.Client} dc_client the client to set up
+ */
+function commandoSetup(dc_client) {
+    dc_client.registry
+        // Registers your custom command groups
+        .registerGroups([
+            ['util', 'Utility'],
+        ])
+        // Registers all of your commands in the ./commands/ directory
+        .registerCommandsIn(path.join(__dirname, 'commands'));
+    dc_client.setProvider(
+        sqlite.open({ filename: 'database.db', driver: sqlite3.Database }).then(db => new Commando.SQLiteProvider(db))
+    ).catch(console.error);
+};
 
-/* Pinging the bot, sends latency */
-client.on('message', msg => {
-    if (msg.author.bot ) return;
-    if (msg.content === 'ping') {
-        msg.channel.send(`pong! \`[${Math.round(client.ws.ping)} ms]\``);
-        console.log('>>> ponged.');
-    }
+/* Logs if bot is ready */
+dc_client.on('ready', () => {
+    console.log(`✅ Logged in as ${dc_client.user.tag}!`);
+    dc_client.user.setActivity('Counter-Strike: Global Offensive', {'type': 'PLAYING'});
 });
 
 /* Logging of DM Messages */
-client.on('message', msg => {
-    if (msg.channel.type === 'dm' && msg.author != client.user) {
+dc_client.on('message', msg => {
+    if (msg.channel.type === 'dm' && msg.author != dc_client.user) {
         console.log(`>>> [DM] ${msg.author.tag}: ${msg.content}`);
     }
 });
 
-logIn(client);
+commandoSetup(dc_client);
+logIn(dc_client);
