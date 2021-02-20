@@ -8,9 +8,8 @@ const config = require('../config.json');
 
 const dc_client = new Commando.Client({
     owner: config.discord.owner,
-    commandPrefix: config.discord.prefix
+    commandPrefix: config.discord.prefix,
 });
-
 
 /**
  * Logs the client in, depending on command line arguments
@@ -30,7 +29,7 @@ function logIn(dc_client) {
         console.log(`Invalid app provided. [${process.argv[2]}`);
         exit(1);
     }
-};
+}
 
 /**
  * Sets up the client (registry, database)
@@ -39,24 +38,38 @@ function logIn(dc_client) {
 function commandoSetup(dc_client) {
     dc_client.registry
         // Registers your custom command groups
-        .registerGroups([
-            ['util', 'Utility'],
-        ])
-        // Registers all of your commands in the ./commands/ directory
+        .registerGroups([['util', 'Utility']])
+        .registerDefaultTypes()
+        .registerDefaultGroups({
+            util: true,
+        })
+        .registerDefaultCommands({
+            eval: false,
+            commandState: false,
+            ping: false,
+            unknownCommand: false,
+        })
+        // Registers all of the commands in the ./commands/ directory
         .registerCommandsIn(path.join(__dirname, 'commands'));
-    dc_client.setProvider(
-        sqlite.open({ filename: 'database.db', driver: sqlite3.Database }).then(db => new Commando.SQLiteProvider(db))
-    ).catch(console.error);
-};
+    dc_client
+        .setProvider(
+            sqlite
+                .open({ filename: 'database.db', driver: sqlite3.Database })
+                .then((db) => new Commando.SQLiteProvider(db))
+        )
+        .catch(console.error);
+}
 
 /* Logs if bot is ready */
 dc_client.on('ready', () => {
     console.log(`✅ Logged in as ${dc_client.user.tag}!`);
-    dc_client.user.setActivity('Counter-Strike: Global Offensive', {'type': 'PLAYING'});
+    dc_client.user.setActivity('Counter-Strike: Global Offensive', {
+        type: 'PLAYING',
+    });
 });
 
 /* Logging of DM Messages */
-dc_client.on('message', msg => {
+dc_client.on('message', (msg) => {
     if (msg.channel.type === 'dm' && msg.author != dc_client.user) {
         console.log(`>>> [DM] ${msg.author.tag}: ${msg.content}`);
     }

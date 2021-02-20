@@ -16,7 +16,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/main.js H",
     "autostart": "nodemon ./src/main.js H",
-    "dev": "nodemon ./src/main.js T"
+    "dev": "nodemon ./src/main.js T",
+    "testing": "node ./src/main.js T"
   },
   "keywords": [],
   "author": "vanitasboi",

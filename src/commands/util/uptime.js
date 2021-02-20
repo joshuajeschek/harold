@@ -20,7 +20,7 @@ module.exports = class UptimeCommand extends Commando.Command {
             minutes: Math.floor(uptime / (1000 * 60)),
             seconds: Math.floor(uptime / 1000),
         };
-        console.log(`[${msg.createdTimestamp}] [CMD] uptime`);
+        console.log(`[${msg.createdTimestamp}] [CMD] [${this.name}] ${msg.content}`);
         return msg.channel.send(
             `I have been online for ${time.days}d, ${time.hours}h, ${time.minutes}m and ${time.seconds}s`
         );
