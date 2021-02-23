@@ -6,7 +6,12 @@
             "BOT Harold": "ODEyMDE0NzQ0NzI2NDA1MTgy.YC6lqQ.n5fizp6Qvi_O-_YtmnIljBmIA_c"
         },
         "prefix": "/",
-        "owner": "456794073194561538"
+        "owner": "456794073194561538",
+        "imgchannel": "813551053844643860",
+        "emoji": {
+            "F1": "813568468511096845",
+            "F2": "813568468783595620"
+        }
     },
     "steam": null
 }

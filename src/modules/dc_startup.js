@@ -36,7 +36,10 @@ module.exports = {
    commandoSetup: function (dc_client) {
         dc_client.registry
             // Registers the custom command groups
-            .registerGroups([['util', 'Utility']])
+            .registerGroups([
+                ['util', 'Utility'],
+                ['vote', 'Voting']
+            ])
             // Registers select default commands
             .registerDefaultTypes()
             .registerDefaultGroups({
