@@ -1,4 +1,5 @@
 const Jimp = require('jimp');
+const date = require('date-and-time');
 
 module.exports = {
     /**
@@ -10,7 +11,9 @@ module.exports = {
      * @param {int} yes 
      * @param {int} no 
      */
-    compileCard: async function(template, filename, starter, text, yes, no) {
+    compileCard: async function(template, starter, text, yes, no) {
+        const now = new Date();
+        filename = `${template}_${date.format(now, 'HH-mm-ss-SSS')}.png`;
         template_filename = `TEMPLATE_${filename}`;
         image = await Jimp.read(`resources/votecards/${template}.png`)
         // print heading
@@ -23,7 +26,7 @@ module.exports = {
             .then(font => {
                 image
                     .print(font, 30, 120, `${text}`, 350)
-                    .write(`${template_filename}.png`);
+                    .write(`${template_filename}`);
         });
         // print yes votes
         await Jimp.loadFont('resources/fonts/boxedround-mg.fnt')
@@ -35,13 +38,15 @@ module.exports = {
             .then(font => {
                 image
                     .print(font, 465, 185, `${no}`)
-                    .write(`${filename}.png`);
+                    .write(`${filename}`);
         });
-        return template_filename;
+        return { filename, template_filename };
     },
 
-    changeValues: async function(template, filename, yes, no) {
-        image = await Jimp.read(`${template}.png`);
+    changeValues: async function(template, yes, no) {
+        const now = new Date();
+        filename = template.split('_', 1) + `_${date.format(now, 'HH-mm-ss-SSS')}.png`
+        image = await Jimp.read(`${template}`);
         // print yes votes
         await Jimp.loadFont('resources/fonts/boxedround-mg.fnt')
             .then(font => {
@@ -52,12 +57,16 @@ module.exports = {
             .then(font => {
                 image
                     .print(font, 465, 185, `${no}`)
-                    .write(`${filename}.png`);
+                    .write(`${filename}`);
         });
+        return filename;
     },
 
-    finalCard: async function(template, state, filename, yes, no) {
-        image = await Jimp.read(`${template}.png`);
+    finalCard: async function(template, state, yes, no) {
+        const now = new Date();
+        filenamearr = template.split('_', 2);
+        var filename =  `${filenamearr[1]}_${date.format(now, 'HH-mm-ss-SSS')}.png`;
+        image = await Jimp.read(`${template}`);
         switch (state) {
             case 'pass':
                 banner = await Jimp.read('resources/votecards/pass.png');
@@ -93,7 +102,9 @@ module.exports = {
             .then(font => {
                 image
                     .print(font, 465, 185, `${no}`)
-                    .write(`${filename}.png`);
+                    .write(`${filename}`);
         });
+
+        return filename;
     }
 }
