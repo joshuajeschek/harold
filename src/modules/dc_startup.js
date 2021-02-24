@@ -53,6 +53,8 @@ module.exports = {
             })
             // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
+        console.log('Loaded these commands:');
+        console.log(dc_client.registry.commands.keys());
         dc_client
             .setProvider(
                 sqlite

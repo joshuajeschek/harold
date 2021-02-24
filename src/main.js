@@ -4,6 +4,9 @@ const { commandoSetup, logIn } = require ('./modules/dc_startup.js');
 
 const config = require('../config.json');
 
+const { FriendlyError } = require('discord.js-commando');
+
+
 const dc_client = new Commando.Client({
     owner: config.discord.owner,
     commandPrefix: config.discord.prefix,
@@ -22,6 +25,12 @@ dc_client.on('message', (msg) => {
     if (msg.channel.type === 'dm' && msg.author != dc_client.user) {
         console.log(`>>> [DM] ${msg.author.tag}: ${msg.content}`);
     }
+});
+
+
+dc_client.on('commandError', (cmd, err) => {
+    if (err instanceof FriendlyError) return;
+    console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
 });
 
 /** Setup and Login of discord client */

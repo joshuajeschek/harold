@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "date-and-time": "^0.14.2",
     "discord.js": "^12.5.1",
     "discord.js-commando": "^0.12.2",
     "inquirer": "^7.3.3",
@@ -17,8 +18,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/main.js H",
     "autostart": "nodemon ./src/main.js H",
-    "dev": "nodemon ./src/main.js T",
-    "testing": "node ./src/main.js T"
+    "dev": "nodemon --trace-warnings ./src/main.js T",
+    "testing": "node ./src/main.js T",
+    "clean": "del *.png"
   },
   "keywords": [],
   "author": "vanitasboi",
