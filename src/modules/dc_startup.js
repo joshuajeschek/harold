@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3');
 const { exit } = require('process');
 const Commando = require('discord.js-commando');
 const config = require('../../config.json');
-
+require('dotenv').config();
 
 module.exports = {
     /**
@@ -19,10 +19,10 @@ module.exports = {
             exit(1);
         } else if (process.argv[2] == 'H') {
             console.log('Logging in as BOT Harold');
-            dc_client.login(config.discord.tokens['BOT Harold']);
+            dc_client.login(process.env.HAROLD_TOKEN);
         } else if (process.argv[2] == 'T') {
             console.log('Logging in as Chester McTester');
-            dc_client.login(config.discord.tokens['Chester McTester']);
+            dc_client.login(process.env.TESTBOT_TOKEN);
         } else {
             console.log(`Invalid app provided. [${process.argv[2]}`);
             exit(1);

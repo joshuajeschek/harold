@@ -1,10 +1,6 @@
 {
     "global": null,
     "discord": {
-        "tokens": {
-            "Chester McTester": "NzQwODkyNTYxMjM3MDgyMTg0.Xyvn9w.ZDHTrvo_77-jJkdH92pXZJYCiKs",
-            "BOT Harold": "ODEyMDE0NzQ0NzI2NDA1MTgy.YC6lqQ.n5fizp6Qvi_O-_YtmnIljBmIA_c"
-        },
         "prefix": "/",
         "owner": "456794073194561538",
         "imgchan": "813551053844643860",
