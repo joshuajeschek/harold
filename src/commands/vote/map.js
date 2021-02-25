@@ -20,34 +20,34 @@ function shortenName(name) {
 module.exports = class VotekickCommand extends VoteCommand {
     constructor(client) {
         super(client, {
-            name: 'votekick',
+            name: 'changemap',
             group: 'vote',
-            aliases: ['vk'],
-            memberName: 'kick',
-            description: 'Do a CS:GO style kick vote, no players harmed',
-            examples: ['kick @ALAN.TN'],
+            aliases: ['cm', 'change'],
+            memberName: 'changemap',
+            description: 'Select the map you want to play on.',
+            examples: ['changemap Cache'],
             args: [
                 {
-                    key: 'player',
-                    label: 'guild member',
-                    prompt: 'Who do you want to "kick"?',
-                    type: 'member',
+                    key: 'map',
+                    label: 'map name',
+                    prompt: 'On which map do you want to play?',
+                    type: 'string',
                 },
             ],
         });
     }
 
-    async run(msg, { player }) {
-        console.log(`>>> votekick by ${msg.author.username}`);
+    async run(msg, { map }) {
+        console.log(`>>> mapchange by ${msg.author.username}`);
         msg.channel.startTyping();
 
         // prepare for printing
-        const playername = shortenName(`${player.user.username}`);
+        const mapname = shortenName(map);
 
         const { votemsg, template_filename } = await this.initializeVote(
             msg,
-            'kick',
-            `Kick player ${playername}?`
+            'map',
+            `Change map to ${mapname}?`
         );
 
         await this.countVotes(votemsg, template_filename);

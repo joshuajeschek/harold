@@ -19,13 +19,13 @@ module.exports = {
         // print heading
         await Jimp.loadFont('resources/fonts/boxedround-w.fnt')
             .then(font => {
-                image.print(font, 70, 27, `Vote by: ${starter}`);
+                image.print(font, 75, 27, `Vote by: ${starter}`);
         });
         // print content
         await Jimp.loadFont('resources/fonts/boxedround-y.fnt')
             .then(font => {
                 image
-                    .print(font, 30, 120, `${text}`, 350)
+                    .print(font, 30, 105, `${text}`, 350)
                     .write(`${template_filename}`);
         });
         // print yes votes
