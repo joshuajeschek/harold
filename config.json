@@ -12,8 +12,8 @@
             "F1": "813568468511096845",
             "F2": "813568468783595620"
         },
-        "votes_to_pass": 1,
-        "minutes_to_vote": 0.2
+        "votes_to_pass": 4,
+        "minutes_to_vote": 5
     },
     "steam": null
 }
