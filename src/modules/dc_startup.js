@@ -15,10 +15,8 @@ function compileMongoUrl() {
         exit(1);
     }
     let url = config.discord.mongourl;
-    console.log(url);
     url = url.replace('<name>', process.env.MONGO_NAME);
     url = url.replace('<password>', process.env.MONGO_PASSWORD);
-    console.log(url);
     switch (app) {
         case 'T':
             url = url.replace('<app>', 'chester'); 
@@ -82,10 +80,9 @@ module.exports = {
         console.log('Loaded these commands:');
         console.log(dc_client.registry.commands.keys());
         const [ mongo_url, db_name ] = compileMongoUrl()
-        console.log(mongo_url, '\n', db_name);
         dc_client
             .setProvider(
-                MongoClient.connect(mongo_url).then(
+                MongoClient.connect(mongo_url, { useUnifiedTopology: true }).then(
                     (client) => new MongoDBProvider(client, db_name)
                 )
             )
