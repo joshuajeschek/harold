@@ -157,8 +157,8 @@ module.exports = class VoteCommand extends Command {
                 this.endVote(
                     votemsg,
                     {
-                        yes_count: yes_count,
-                        no_count: no_count,
+                        yes_count,
+                        no_count
                     },
                     template_filename,
                     votes_to_pass
@@ -168,8 +168,8 @@ module.exports = class VoteCommand extends Command {
                 this.updateEmbed(
                     votemsg,
                     {
-                        yes_count: yes_count,
-                        no_count: no_count,
+                        yes_count,
+                        no_count
                     },
                     template_filename
                 );
@@ -193,8 +193,8 @@ module.exports = class VoteCommand extends Command {
                 this.endVote(
                     votemsg,
                     {
-                        yes_count: yes_count,
-                        no_count: no_count,
+                        yes_count,
+                        no_count
                     },
                     template_filename,
                     votes_to_pass
