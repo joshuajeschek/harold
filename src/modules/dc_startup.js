@@ -1,12 +1,38 @@
 /** Useful functions that are run at the startup of the discord bot */
 
 const path = require('path');
-const sqlite = require('sqlite');
-const sqlite3 = require('sqlite3');
 const { exit } = require('process');
 const Commando = require('discord.js-commando');
 const config = require('../../config.json');
 require('dotenv').config();
+const { MongoClient } = require('mongodb');
+const { MongoDBProvider } = require('commando-provider-mongo')
+
+function compileMongoUrl() {
+    const app = process.argv[2];
+    if (!app) {
+        console.log(`Invalid app provided. [${process.argv[2]}`);
+        exit(1);
+    }
+    let url = config.discord.mongourl;
+    console.log(url);
+    url = url.replace('<name>', process.env.MONGO_NAME);
+    url = url.replace('<password>', process.env.MONGO_PASSWORD);
+    console.log(url);
+    switch (app) {
+        case 'T':
+            url = url.replace('<app>', 'chester'); 
+            return [ url, 'chester' ];
+    
+        case 'H':
+            url = url.replace('<app>', 'harold'); 
+            return [ url, 'harold' ];
+
+        default:
+            // should never occur
+            break;
+    }
+}
 
 module.exports = {
     /**
@@ -30,15 +56,15 @@ module.exports = {
     },
 
     /**
-    * Sets up the client (registry, database)
-    * @param {Commando.Client} dc_client the client to set up
-    */
-   commandoSetup: function (dc_client) {
+     * Sets up the client (registry, database)
+     * @param {Commando.Client} dc_client the client to set up
+     */
+    commandoSetup: function (dc_client) {
         dc_client.registry
             // Registers the custom command groups
             .registerGroups([
                 ['util', 'Utility'],
-                ['vote', 'Voting']
+                ['vote', 'Voting'],
             ])
             // Registers select default commands
             .registerDefaultTypes()
@@ -55,12 +81,14 @@ module.exports = {
             .registerCommandsIn(path.join(__dirname, '../commands'));
         console.log('Loaded these commands:');
         console.log(dc_client.registry.commands.keys());
+        const [ mongo_url, db_name ] = compileMongoUrl()
+        console.log(mongo_url, '\n', db_name);
         dc_client
             .setProvider(
-                sqlite
-                    .open({ filename: 'database.db', driver: sqlite3.Database })
-                    .then((db) => new Commando.SQLiteProvider(db))
+                MongoClient.connect(mongo_url).then(
+                    (client) => new MongoDBProvider(client, db_name)
+                )
             )
             .catch(console.error);
-    }
+    },
 };
