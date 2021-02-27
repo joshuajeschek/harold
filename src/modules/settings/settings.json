@@ -1,0 +1,24 @@
+{
+    "owner": {
+        "voting": {
+            "time": {
+                "default": 5,
+                "description": "The maximum time a vote can take, in minutes."
+            }
+        }
+    },
+    "manager": {
+        "voting": {
+            "votes": {
+                "default": 4,
+                "description": "How many votes it takes for a vote to pass / fail."
+            }
+        },
+        "common": {
+            "prefix": {
+                "default": "/",
+                "description": "The prefix for commands in this guild. Can also be changed through the command `prefix`."
+            }
+        }
+    }
+}

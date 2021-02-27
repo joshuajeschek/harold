@@ -2,35 +2,10 @@
 
 const path = require('path');
 const { exit } = require('process');
-const Commando = require('discord.js-commando');
-const config = require('../../config.json');
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const { MongoDBProvider } = require('commando-provider-mongo')
-
-function compileMongoUrl() {
-    const app = process.argv[2];
-    if (!app) {
-        console.log(`Invalid app provided. [${process.argv[2]}`);
-        exit(1);
-    }
-    let url = config.discord.mongourl;
-    url = url.replace('<name>', process.env.MONGO_NAME);
-    url = url.replace('<password>', process.env.MONGO_PASSWORD);
-    switch (app) {
-        case 'T':
-            url = url.replace('<app>', 'chester'); 
-            return [ url, 'chester' ];
-    
-        case 'H':
-            url = url.replace('<app>', 'harold'); 
-            return [ url, 'harold' ];
-
-        default:
-            // should never occur
-            break;
-    }
-}
+const { compileMongoUrl } = require('./mongo');
 
 module.exports = {
     /**
@@ -66,14 +41,9 @@ module.exports = {
             ])
             // Registers select default commands
             .registerDefaultTypes()
-            .registerDefaultGroups({
-                util: true,
-            })
+            .registerDefaultGroups()
             .registerDefaultCommands({
-                eval: false,
-                commandState: false,
-                ping: false,
-                unknownCommand: false,
+                ping: false
             })
             // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
