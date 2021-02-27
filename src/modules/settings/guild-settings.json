@@ -1,0 +1,16 @@
+{
+    "voting": {
+        "time": {
+            "default": 5,
+            "description": "The maximum time a vote can take, in minutes.",
+            "value": 5,
+            "scope": 2
+        },
+        "votes": {
+            "default": 4,
+            "description": "How many votes it takes for a vote to pass / fail.",
+            "value": 4,
+            "scope": 1
+        }
+    }
+}

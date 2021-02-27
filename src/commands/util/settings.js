@@ -1,5 +1,6 @@
-const { Command, Permissions } = require('discord.js-commando');
-const { getSettings } = require('../../modules/settings/settings-module')
+const { Command } = require('discord.js-commando');
+const { getUserSettings, getGuildSettings } = require('../../modules/settings/settings-module')
+const util = require('util');
 
 module.exports = class SettingsCommand extends Command {
     constructor(client) {
@@ -38,22 +39,40 @@ module.exports = class SettingsCommand extends Command {
 
     async run(msg, { group, setting, value }) {
 
-        let scope = 0;
-        let guild_id
-        if (msg.channel.type != 'dm') {
-            const member = msg.guild.member(msg.author);
-            guild_id = msg.guild.id;
+        msg.channel.startTyping();
 
+        if (msg.channel.type == 'dm') {
+            // no arguments provided
+            if (!group) {
+                const settings = await getUserSettings(msg.author.id);
+                console.log(util.inspect(settings, { showHidden: false, depth: null }));
+            }
+
+        } else {
+            const member = msg.guild.member(msg.author);
+            const guild_id = msg.guild.id;
+            let scope;
+
+            // figure out scope
             if (this.client.owners.includes(msg.author)) {
                 scope = 2;
             } else if (member.hasPermission('MANAGE_GUILD')){
                 scope = 1;
+            } else {
+                msg.channel.send(`You do not have the right permissions to access my settings in this guild. \n Use this command in our DM and we can sort out your personal settings.`);
+                msg.channel.stopTyping();
+                return;
             }
+
+            // no arguments provided, list settings
+            if (!group) {
+                const settings = await getGuildSettings(guild_id, scope);
+                console.log(util.inspect(settings, { showHidden: false, depth: null }));
+            }
+            
         }
 
-        if (!group) {
-            const settings = await getSettings(guild_id, msg.author.id, scope);
-        }
+        msg.channel.stopTyping();
     }
 
 }
