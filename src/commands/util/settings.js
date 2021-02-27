@@ -38,17 +38,21 @@ module.exports = class SettingsCommand extends Command {
 
     async run(msg, { group, setting, value }) {
 
-        const member = msg.guild.member(msg.author);
-
         let scope = 0;
-        if (this.client.owners.includes(msg.author)) {
-            scope = 2;
-        } else if (member.hasPermission('MANAGE_GUILD')){
-            scope = 1;
+        let guild_id
+        if (msg.channel.type != 'dm') {
+            const member = msg.guild.member(msg.author);
+            guild_id = msg.guild.id;
+
+            if (this.client.owners.includes(msg.author)) {
+                scope = 2;
+            } else if (member.hasPermission('MANAGE_GUILD')){
+                scope = 1;
+            }
         }
 
         if (!group) {
-            const settings = await getSettings(msg.guild.id, msg.author.id, scope);
+            const settings = await getSettings(guild_id, msg.author.id, scope);
         }
     }
 

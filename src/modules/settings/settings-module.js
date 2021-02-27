@@ -6,6 +6,10 @@ const guildSettingsSchema = require('./schemas/guildsettings-schema');
 const userSettingsSchema = require('./schemas/usersettings-schema');
 const util = require('util');
 
+/**
+ * returns all guild specific settings that have been set in the db
+ * @param {String} guild_id 
+ */
 async function getGuildSettings(guild_id) {
     let settings;
     await mongo().then(async (mongoose) => {
@@ -21,6 +25,10 @@ async function getGuildSettings(guild_id) {
     return settings;
 }
 
+/**
+ * returns all user specific settings that have been set in the db
+ * @param {String} user_id 
+ */
 async function getUserSettings(user_id) {
     let settings;
     await mongo().then(async (mongoose) => {
@@ -36,16 +44,24 @@ async function getUserSettings(user_id) {
     return settings;
 }
 
+/**
+ * This function returns an object with all the settings that are accessible
+ * by the user with user_id in the guild with guild_id
+ * the guild_id can be undefined, if the scope is 0 (e.g. in DMs)
+ * @param {String} guild_id
+ * @param {String} user_id 
+ * @param {Number} scope access level
+ */
 const getSettings = async function (guild_id, user_id, scope) {
     let settings = defaults;
     // the scope, aka the settings the user has access to
     switch (scope) {
         case 0:
-            delete settings.server.manager;
-        /* FALLS THROUGH */
+            delete settings.server;
+            break;
         case 1:
             delete settings.server.owner;
-        /* FALLS THROUGH */
+            break;
         default:
             break;
     }
