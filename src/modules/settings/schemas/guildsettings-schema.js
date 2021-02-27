@@ -14,9 +14,9 @@ const settingsObject = mongoose.Schema({
     }
 })
 
-const settingsSchema = mongoose.Schema({
+const guildSettingsSchema = mongoose.Schema({
     guild: reqString,
     settings: settingsObject
 });
 
-module.exports = mongoose.model('settings', settingsSchema);
+module.exports = mongoose.model('settings', guildSettingsSchema);

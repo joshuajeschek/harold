@@ -1,23 +1,30 @@
 {
-    "owner": {
-        "voting": {
-            "time": {
-                "default": 5,
-                "description": "The maximum time a vote can take, in minutes."
+    "server": {
+        "owner": {
+            "voting": {
+                "time": {
+                    "default": 5,
+                    "description": "The maximum time a vote can take, in minutes.",
+                    "value": 5
+                }
+            }
+        },
+        "manager": {
+            "voting": {
+                "votes": {
+                    "default": 4,
+                    "description": "How many votes it takes for a vote to pass / fail.",
+                    "value": 4
+                }
             }
         }
     },
-    "manager": {
-        "voting": {
-            "votes": {
-                "default": 4,
-                "description": "How many votes it takes for a vote to pass / fail."
-            }
-        },
-        "common": {
-            "prefix": {
-                "default": "/",
-                "description": "The prefix for commands in this guild. Can also be changed through the command `prefix`."
+    "user": {
+        "steam": {
+            "rank": {
+                "default": true,
+                "description": "Wether your rank should be public, accessible through roles and the `info` command.",
+                "value": true
             }
         }
     }

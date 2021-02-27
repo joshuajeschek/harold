@@ -48,7 +48,7 @@ module.exports = class SettingsCommand extends Command {
         }
 
         if (!group) {
-            const settings = await getSettings(msg.guild.id, scope);
+            const settings = await getSettings(msg.guild.id, msg.author.id, scope);
         }
     }
 
