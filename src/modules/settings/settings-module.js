@@ -21,7 +21,9 @@ const getUserSettings = async function (user_id) {
             const result = await userSettingsSchema.findOne({
                 user: user_id,
             });
-            user_settings = result._doc;
+            if (result) {
+                user_settings = result._doc;
+            }
         } finally {
             mongoose.connection.close();
         }
@@ -67,7 +69,9 @@ const getGuildSettings = async function(guild_id, scope) {
             const result = await guildSettingsSchema.findOne({
                 guild: guild_id,
             });
-            guild_settings = result.settings._doc;
+            if (result) {
+                guild_settings = result.settings._doc;
+            }
         } finally {
             mongoose.connection.close();
         }
