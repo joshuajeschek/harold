@@ -3,13 +3,24 @@
         "time": {
             "default": 5,
             "description": "The maximum time a vote can take, in minutes.",
+            "example": "`set voting time 8`",
             "value": 5,
             "scope": 2
         },
         "votes": {
             "default": 4,
             "description": "How many votes it takes for a vote to pass / fail.",
+            "example": "`set voting count 2`",
             "value": 4,
+            "scope": 1
+        }
+    },
+    "steam": {
+        "roles": {
+            "default": true,
+            "description": "Whether ranks should be automatically assigned to users, based on their CS:GO rank, if they are connected.",
+            "example": "`set steam roles false`",
+            "value": true,
             "scope": 1
         }
     }

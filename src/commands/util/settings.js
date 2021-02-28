@@ -1,16 +1,65 @@
+'use strict';
+
 const { Command } = require('discord.js-commando');
 const { getUserSettings, getGuildSettings } = require('../../modules/settings/settings-module')
 const util = require('util');
+const { MessageEmbed } = require('discord.js');
+const config = require('../../../config.json');
+
+/**
+ * Compiles an embed which list all the settings in the settings object
+ * @param {Object} settings The settings object that should be compiled into a embed
+ * @param {*} env 'dm' / 'guild'
+ */
+function compileSettingsEmbed(settings, env) {
+    
+    // set properties that are always the same
+    const embed = new MessageEmbed()
+        .setColor([93, 116, 134])
+        .setTimestamp()
+        .setThumbnail(config.images.settings);
+
+    
+    // set environment specific title and description
+    if (env == 'dm') {
+        embed
+            .setTitle('Your Personal Settings')
+            .setDescription('Here you can access and modify your user specific settings. \n' +
+                'To change a setting, do: `set <group> <setting> <value>`');
+    } else {
+        embed
+            .setTitle('Server Settings')
+            .setDescription('Here you can access and modify my settings on this server. \n' +
+                'To change a setting, do: `set <group> <setting> <value>`.');
+    }
+
+    // list all settings
+    for (const group in settings) {
+        embed.addField('\u200b', `\`\`\`fix\n⇘ ${group}\n\`\`\``);
+        for (const setting in settings[group]) {
+            embed.addField(
+                `⇒ ${setting}`,
+                `${settings[group][setting].description} \n` + 
+                `current setting: **${settings[group][setting].value}** ` + 
+                `(default: ${settings[group][setting].default}) \n` +
+                `${settings[group][setting].example}`,
+                true
+            )
+        }
+    }
+    
+    return embed;
+}
 
 module.exports = class SettingsCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'settings',
             group: 'util',
-            aliases: ['set'],
+            aliases: ['set', 'setting'],
             memberName: 'settings',
             description: 'See and edit this bot\'s settings ',
-            examples: ['kick @ALAN.TN'],
+            examples: ['set voting count 5'],
             args: [
                 {
                     key: 'group',
@@ -46,6 +95,8 @@ module.exports = class SettingsCommand extends Command {
             if (!group) {
                 const settings = await getUserSettings(msg.author.id);
                 console.log(util.inspect(settings, { showHidden: false, depth: null }));
+                const embed = compileSettingsEmbed(settings, 'dm');
+                msg.channel.send(embed);
             }
 
         } else {
@@ -68,6 +119,8 @@ module.exports = class SettingsCommand extends Command {
             if (!group) {
                 const settings = await getGuildSettings(guild_id, scope);
                 console.log(util.inspect(settings, { showHidden: false, depth: null }));
+                const embed = compileSettingsEmbed(settings, 'guild');
+                msg.channel.send(embed);
             }
             
         }
