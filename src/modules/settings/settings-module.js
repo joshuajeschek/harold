@@ -93,8 +93,63 @@ const getGuildSettings = async function(guild_id, scope) {
 
 }
 
+async function getUserSetting(user_id, group, setting) {
+
+    const key = `${group}_${setting}`;
+
+    // get set user settings
+    let user_setting;
+    await mongo().then(async (mongoose) => {
+        try {
+            const result = await userSettingsSchema.findOne({
+                user: user_id,
+            });
+            if (result) {
+                user_setting = result._doc[key];
+            }
+        } finally {
+            mongoose.connection.close();
+        }
+    });
+
+    if (user_setting != undefined) {
+        return user_setting;
+    } else {
+        return user_defaults[group][setting].default;
+    }
+
+}
+
+async function getGuildSetting(guild_id, group, setting) {
+
+    const key = `${group}_${setting}`;
+
+    // get set user settings
+    let guild_setting;
+    await mongo().then(async (mongoose) => {
+        try {
+            const result = await guildSettingsSchema.findOne({
+                guild: guild_id,
+            });
+            if (result) {
+                guild_setting = result.settings._doc[key];
+            }
+        } finally {
+            mongoose.connection.close();
+        }
+    });
+
+    if (guild_setting != undefined) {
+        return guild_setting;
+    } else {
+        return guild_defaults[group][setting].default;
+    }
+
+}
 
 module.exports = {
     getUserSettings,
-    getGuildSettings
+    getGuildSettings,
+    getUserSetting,
+    getGuildSetting
 };

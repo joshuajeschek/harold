@@ -1,7 +1,7 @@
 'use strict';
 
 const { Command } = require('discord.js-commando');
-const { getUserSettings, getGuildSettings } = require('../../modules/settings/settings-module')
+const { getUserSettings, getGuildSettings, getUserSetting, getGuildSetting } = require('../../modules/settings/settings-module')
 const { MessageEmbed } = require('discord.js');
 const config = require('../../../config.json');
 const options = require('../../modules/settings/possibilities.json');
@@ -40,7 +40,7 @@ function compileSettingsEmbed(settings, env) {
             embed.addField(
                 `⇒ ${setting}`,
                 `${settings[group][setting].description} \n` + 
-                `current setting: **${settings[group][setting].value}** ` + 
+                `current value: **${settings[group][setting].value}** ` + 
                 `(default: ${settings[group][setting].default}) \n` +
                 `${settings[group][setting].example}`,
                 true
@@ -49,6 +49,25 @@ function compileSettingsEmbed(settings, env) {
     }
     
     return embed;
+}
+
+/**
+ * checks if the group / setting exists
+ * @param {Number} scope 
+ * @param {String} group 
+ * @param {String} setting 
+ */
+function checkExistence(scope, group, setting) {
+    if (group in options[scope]) {
+        if (!setting) {
+            return true;
+        } else {
+            if (options[scope][group].includes(setting)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 module.exports = class SettingsCommand extends Command {
@@ -87,7 +106,7 @@ module.exports = class SettingsCommand extends Command {
         });
     }
 
-    async askForMore(msg, { group, setting }, options) {
+    async askForMore(msg, { group, setting }) {
         let prompt, value;
         if (!setting) {
             prompt = `**Which setting in the group \`${group}\` do  you want to edit?**`;
@@ -142,17 +161,19 @@ module.exports = class SettingsCommand extends Command {
                 const embed = compileSettingsEmbed(settings, 'dm');
                 msg.channel.send(embed);
             } else if (!setting) {  // only group provided
-                if (! ( group in options[0])) {
+                if (!checkExistence(0, group)) {
                     msg.reply('This group is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
             } else if (!value) {    // group and settings, no value
-                if (! ( options[0][group].includes(setting) ) ) {
+                if (!checkExistence(0, group, setting) ) {
                     msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
+                    const cur_value = await getUserSetting(msg.author.id, group, setting);
+                    msg.reply(`current value: **${cur_value}**`);
                     this.askForMore(msg, {group, setting});
                 }
             } else {    // everything is there
@@ -182,17 +203,19 @@ module.exports = class SettingsCommand extends Command {
                 const embed = compileSettingsEmbed(settings, 'guild');
                 msg.channel.send(embed);
             } else if (!setting) {  // only group provided
-                if (! ( group in options[scope])) {
+                if (!checkExistence(scope, group)) {
                     msg.reply('This group is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
             } else if (!value) {    // group and setting, no value
-                if (! ( options[scope][group].includes(setting) ) ) {
+                if (!checkExistence(scope, group, setting)) {
                     msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
+                    const cur_value = await getGuildSetting(msg.guild.id, group, setting);
+                    msg.reply(`current value: **${cur_value}**`);
                     this.askForMore(msg, {group, setting});
                 }
             } else {    // everything is there
