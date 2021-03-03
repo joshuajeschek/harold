@@ -6,6 +6,9 @@ const { mongo } = require('../mongo');
 const guildSettingsSchema = require('./schemas/guildsettings-schema');
 const userSettingsSchema = require('./schemas/usersettings-schema');
 
+// de_cache for quicker access
+let user_cache = new Map();
+let guild_cache = new Map();
 
 /**
  * returns all the settings of the user, with the given user id
@@ -16,18 +19,22 @@ const getUserSettings = async function (user_id) {
 
     // get set user settings
     let user_settings;
-    await mongo().then(async (mongoose) => {
-        try {
-            const result = await userSettingsSchema.findOne({
-                user: user_id,
-            });
-            if (result) {
-                user_settings = result._doc;
+    if (!user_cache[user_id]) {
+        await mongo().then(async (mongoose) => {
+            try {
+                const result = await userSettingsSchema.findOne({
+                    user: user_id,
+                });
+                if (result) {
+                    user_settings = user_cache[user_id] = result._doc;
+                }
+            } finally {
+                mongoose.connection.close();
             }
-        } finally {
-            mongoose.connection.close();
-        }
-    });
+        });
+    } else {
+        user_settings = user_cache[user_id];
+    }
 
     // merge default and user settings
     if (user_settings) {
@@ -64,18 +71,23 @@ const getGuildSettings = async function(guild_id, scope) {
 
     // get set guild settings
     let guild_settings;
-    await mongo().then(async (mongoose) => {
-        try {
-            const result = await guildSettingsSchema.findOne({
-                guild: guild_id,
-            });
-            if (result) {
-                guild_settings = result.settings._doc;
+    if (!guild_cache[guild_id]) {
+        await mongo().then(async (mongoose) => {
+            try {
+                const result = await guildSettingsSchema.findOne({
+                    guild: guild_id,
+                });
+                if (result) {
+                    guild_settings = guild_cache[guild_id] = result.settings._doc;
+                }
+            } finally {
+                mongoose.connection.close();
             }
-        } finally {
-            mongoose.connection.close();
-        }
-    });
+        });
+    } else {
+        guild_settings = guild_cache[guild_id];
+    }
+    
 
     // merge settings
     if (guild_settings) {
@@ -93,6 +105,12 @@ const getGuildSettings = async function(guild_id, scope) {
 
 }
 
+/**
+ * returns the value of a user setting (must exist)
+ * @param {String} user_id 
+ * @param {String} group 
+ * @param {String} setting 
+ */
 async function getUserSetting(user_id, group, setting) {
 
     const key = `${group}_${setting}`;
@@ -120,6 +138,12 @@ async function getUserSetting(user_id, group, setting) {
 
 }
 
+/**
+ * returns a single guild settings value, (must exist)
+ * @param {String} guild_id 
+ * @param {String} group 
+ * @param {String} setting 
+ */
 async function getGuildSetting(guild_id, group, setting) {
 
     const key = `${group}_${setting}`;
