@@ -143,14 +143,14 @@ module.exports = class SettingsCommand extends Command {
                 msg.channel.send(embed);
             } else if (!setting) {  // only group provided
                 if (! ( group in options[0])) {
-                    msg.reply('This group does not exist.' +
+                    msg.reply('This group is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
             } else if (!value) {    // group and settings, no value
                 if (! ( options[0][group].includes(setting) ) ) {
-                    msg.reply('This setting does not exist.' +
+                    msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group, setting});
@@ -170,7 +170,7 @@ module.exports = class SettingsCommand extends Command {
             } else if (member.hasPermission('MANAGE_GUILD')){
                 scope = 1;
             } else {
-                msg.channel.send('You do not have the right permissions to access my settings in this guild.\n' +
+                msg.channel.send('You do not have the permissions to access my settings in this guild.\n' +
                     'Use this command in our DM and we can sort out your personal settings.');
                 msg.channel.stopTyping();
                 return;
@@ -183,14 +183,14 @@ module.exports = class SettingsCommand extends Command {
                 msg.channel.send(embed);
             } else if (!setting) {  // only group provided
                 if (! ( group in options[scope])) {
-                    msg.reply('This group does not exist.' +
+                    msg.reply('This group is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
             } else if (!value) {    // group and setting, no value
                 if (! ( options[scope][group].includes(setting) ) ) {
-                    msg.reply('This setting does not exist.' +
+                    msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
                     this.askForMore(msg, {group, setting});
