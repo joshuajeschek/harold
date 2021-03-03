@@ -2,9 +2,9 @@
 
 const { Command } = require('discord.js-commando');
 const { getUserSettings, getGuildSettings } = require('../../modules/settings/settings-module')
-const util = require('util');
 const { MessageEmbed } = require('discord.js');
 const config = require('../../../config.json');
+const options = require('../../modules/settings/possibilities.json');
 
 /**
  * Compiles an embed which list all the settings in the settings object
@@ -63,27 +63,72 @@ module.exports = class SettingsCommand extends Command {
             args: [
                 {
                     key: 'group',
-                    label: 'settings group',
+                    label: 'group',
                     prompt: 'Which group do you want to edit?',
                     default: false,
                     type: 'string',
                 },
                 {
                     key: 'setting',
-                    label: 'the individual setting you want to edit',
+                    label: 'setting',
                     prompt: 'Which setting do you want to edit?',
                     default: false,
                     type: 'string',
+                    require: true
                 },
                 {
                     key: 'value',
-                    label: 'the value you want to set',
+                    label: 'value',
                     prompt: 'What should the setting be?',
                     default: false,
                     type: 'string',
                 }
             ],
         });
+    }
+
+    async askForMore(msg, { group, setting }, options) {
+        let prompt, value;
+        if (!setting) {
+            prompt = `**Which setting in the group \`${group}\` do  you want to edit?**`;
+        } else {
+            prompt = `**Please provide a value for the setting \`${setting}\`!**`;
+        }
+
+        const filter = (message) => {
+            return (message.author == msg.author);
+        }
+
+        const m_collector = msg.channel.createMessageCollector(filter, {time: 30 * 1000});
+
+        msg.reply(
+            prompt +
+            '\nRespond with `cancel` to cancel the command.' +
+            ' The command will automatically be cancelled in 30 seconds.' +
+            '\nRespond with `list` to see a list of all settings.');
+
+        m_collector.on('collect', m => {
+            if (m.content.toLowerCase() == 'cancel') {
+                m_collector.stop('cancel');
+                return;
+            } else if (m.content.toLowerCase() == 'list'){
+                m_collector.stop('list');
+                this.run(m, {});
+                return;
+            } else if (!setting) {
+                setting = m.content;
+            } else {
+                value = m.content;
+            }
+            this.run(m, {group, setting, value});
+            m_collector.stop('collect'); 
+        });
+        m_collector.on('end', ( _, reason ) => {
+            if ( (reason != 'collect') && (reason != 'list') ) {
+                msg.reply('Cancelled command.');
+            }
+        });
+
     }
 
     async run(msg, { group, setting, value }) {
@@ -96,9 +141,22 @@ module.exports = class SettingsCommand extends Command {
                 const settings = await getUserSettings(msg.author.id);
                 const embed = compileSettingsEmbed(settings, 'dm');
                 msg.channel.send(embed);
-            } else if (!setting) {
-                msg.channel.send('You did not provide a setting!\n' +
-                    'Do `settings` to see all settings or `set <group> <setting> <value>` to change a setting');
+            } else if (!setting) {  // only group provided
+                if (! ( group in options[0])) {
+                    msg.reply('This group does not exist.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+                } else {
+                    this.askForMore(msg, {group}, options);
+                }
+            } else if (!value) {    // group and settings, no value
+                if (! ( options[0][group].includes(setting) ) ) {
+                    msg.reply('This setting does not exist.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+                } else {
+                    this.askForMore(msg, {group, setting});
+                }
+            } else {    // everything is there
+                msg.channel.send('PLACEHOLDER')
             }
 
         } else {
@@ -123,9 +181,22 @@ module.exports = class SettingsCommand extends Command {
                 const settings = await getGuildSettings(guild_id, scope);
                 const embed = compileSettingsEmbed(settings, 'guild');
                 msg.channel.send(embed);
-            } else if (!setting) {
-                msg.channel.send('You did not provide a setting!\n' +
-                    'Do `settings` to see all settings or `set <group> <setting> <value>` to change a setting');
+            } else if (!setting) {  // only group provided
+                if (! ( group in options[scope])) {
+                    msg.reply('This group does not exist.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+                } else {
+                    this.askForMore(msg, {group}, options);
+                }
+            } else if (!value) {    // group and setting, no value
+                if (! ( options[scope][group].includes(setting) ) ) {
+                    msg.reply('This setting does not exist.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+                } else {
+                    this.askForMore(msg, {group, setting});
+                }
+            } else {    // everything is there
+                msg.channel.send('PLACEHOLDER')
             }
             
         }

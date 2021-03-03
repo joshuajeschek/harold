@@ -43,7 +43,8 @@ module.exports = {
             .registerDefaultTypes()
             .registerDefaultGroups()
             .registerDefaultCommands({
-                ping: false
+                ping: false,
+                unknownCommand: false
             })
             // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
