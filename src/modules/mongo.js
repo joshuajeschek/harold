@@ -34,7 +34,7 @@ const mongo = async function () {
   await mongoose.connect(mongo_url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: true,
+    useFindAndModify: false,
   })
 
   return mongoose;

@@ -1,7 +1,16 @@
 'use strict';
 
 const { Command } = require('discord.js-commando');
-const { getUserSettings, getGuildSettings, getUserSetting, getGuildSetting } = require('../../modules/settings/settings-module')
+
+const {
+    getUserSettings,
+    getGuildSettings,
+    getUserSetting,
+    getGuildSetting,
+    verifyValue,
+    setGuildSetting,
+    setUserSetting } = require('../../modules/settings/settings-module');
+
 const { MessageEmbed } = require('discord.js');
 const config = require('../../../config.json');
 const options = require('../../modules/settings/possibilities.json');
@@ -106,6 +115,12 @@ module.exports = class SettingsCommand extends Command {
         });
     }
 
+    /**
+     * Sends a message asking for more information
+     * (either a setting or a value)
+     * @param {Message} msg original message
+     * @param {String} param1 Either group or group and setting 
+     */
     async askForMore(msg, { group, setting }) {
         let prompt, value;
         if (!setting) {
@@ -160,6 +175,7 @@ module.exports = class SettingsCommand extends Command {
                 const settings = await getUserSettings(msg.author.id);
                 const embed = compileSettingsEmbed(settings, 'dm');
                 msg.channel.send(embed);
+
             } else if (!setting) {  // only group provided
                 if (!checkExistence(0, group)) {
                     msg.reply('This group is not available.' +
@@ -167,17 +183,38 @@ module.exports = class SettingsCommand extends Command {
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
+
             } else if (!value) {    // group and settings, no value
                 if (!checkExistence(0, group, setting) ) {
                     msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
+                    // send current value
                     const cur_value = await getUserSetting(msg.author.id, group, setting);
                     msg.reply(`current value: **${cur_value}**`);
                     this.askForMore(msg, {group, setting});
                 }
+
             } else {    // everything is there
-                msg.channel.send('PLACEHOLDER')
+                if (!checkExistence(0, group, setting) ) {
+                    msg.reply('This setting is not available.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+                } else {
+                    // convert the value to the right format, validate it
+                    const conv_value = verifyValue('dm', group, setting, value);
+                    if (conv_value == undefined) {
+                        msg.reply(`Please check your input, the value \`${value}\` is invalid.`);
+
+                    } else {
+                        // ACTUAL CHANGE OF SETTING
+                        const succ = setUserSetting(msg.author.id, group, setting, conv_value);
+                        if (succ) {
+                            msg.reply('The setting has been applied.');
+                        } else {
+                            msg.reply(`Something went wrong. Please contact ${this.client.owners[0].tag}`);
+                        }
+                    }
+                }
             }
 
         } else {
@@ -202,6 +239,7 @@ module.exports = class SettingsCommand extends Command {
                 const settings = await getGuildSettings(guild_id, scope);
                 const embed = compileSettingsEmbed(settings, 'guild');
                 msg.channel.send(embed);
+
             } else if (!setting) {  // only group provided
                 if (!checkExistence(scope, group)) {
                     msg.reply('This group is not available.' +
@@ -209,19 +247,40 @@ module.exports = class SettingsCommand extends Command {
                 } else {
                     this.askForMore(msg, {group}, options);
                 }
+
             } else if (!value) {    // group and setting, no value
                 if (!checkExistence(scope, group, setting)) {
                     msg.reply('This setting is not available.' +
                     ' To see a list of all settings, try the `settings` command without any arguments.')
                 } else {
-                    const cur_value = await getGuildSetting(msg.guild.id, group, setting);
+                    // send current value
+                    const cur_value = await getGuildSetting(guild_id, group, setting);
                     msg.reply(`current value: **${cur_value}**`);
                     this.askForMore(msg, {group, setting});
                 }
+
             } else {    // everything is there
-                msg.channel.send('PLACEHOLDER')
+                if (!checkExistence(scope, group, setting) ) {
+                    msg.reply('This setting is not available.' +
+                    ' To see a list of all settings, try the `settings` command without any arguments.')
+
+                } else {
+                    // convert value and verify it
+                    const conv_value = verifyValue('guild', group, setting, value);
+                    if (conv_value == undefined) {
+                        msg.reply(`Please check your input, the value \`${value}\` is invalid.`);
+
+                    } else {
+                        // ACTUAL CHANGE OF SETTING
+                        const succ = setGuildSetting(guild_id, group, setting, conv_value);
+                        if (succ) {
+                            msg.reply('The setting has been applied.');
+                        } else {
+                            msg.reply(`Something went wrong. Please contact ${this.client.owners[0].tag}`);
+                        }
+                    }
+                }
             }
-            
         }
 
         msg.channel.stopTyping();
