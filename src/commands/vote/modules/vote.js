@@ -7,6 +7,7 @@ const { MessageEmbed, ReactionCollector } = require('discord.js');
 const { compileCard, changeValues, finalCard } = require('./votecards.js');
 const config = require('../../../../config.json');
 const { deleteFile } = require('../../../modules/utility.js');
+const { getGuildSetting } = require('../../../modules/settings/settings-module');
 
 /**
  * Trims the starters name so it fits in the header
@@ -49,11 +50,13 @@ module.exports = class VoteCommand extends Command {
         // url to put in the embed
         const imgurl = await this.getImageUrl(filename);
 
+        const minutes_to_vote = await getGuildSetting(msg.guild.id, 'voting', 'time');
+
         // prepare the embed
         const embed = new MessageEmbed()
             .setImage(imgurl)
             .setFooter(
-                `Vote by ${starter}, ${config.discord.minutes_to_vote} minutes to vote.`
+                `Vote by ${starter}, ${minutes_to_vote} minutes to vote.`
             )
             .setColor([37, 37, 37]);
 
@@ -86,9 +89,12 @@ module.exports = class VoteCommand extends Command {
             );
         };
 
+        const minutes_to_vote = await getGuildSetting(votemsg.guild.id, 'voting', 'time');
+        const votes_to_pass = await getGuildSetting(votemsg.guild.id, 'voting', 'count');
+
         // the collector itself
         const react_collector = new ReactionCollector(votemsg, react_filter, {
-            time: config.discord.minutes_to_vote * 60 * 1000,
+            time: minutes_to_vote * 60 * 1000,
             dispose: true,
         });
 
@@ -145,11 +151,6 @@ module.exports = class VoteCommand extends Command {
             const no_ob = react_collector.collected.get(this.react_no.id);
             const yes_count = yes_ob === undefined ? 0 : yes_ob.count - 1;
             const no_count = no_ob === undefined ? 0 : no_ob.count - 1;
-            const votes_to_pass = this.client.provider.get(
-                votemsg.guild,
-                'votes_to_pass',
-                config.discord.votes_to_pass
-            );
 
             // find out if vote is finished
             if (yes_count >= votes_to_pass || no_count >= votes_to_pass) {
@@ -178,18 +179,13 @@ module.exports = class VoteCommand extends Command {
 
         // emitted whenever the vote ends,
         // especially on timeout
-        react_collector.on('end', (collected, reason) => {
+        react_collector.on('end', (_, reason) => {
             // check if vote timed out
             if (reason != 'vote_success') {
                 const yes_ob = react_collector.collected.get(this.react_yes.id);
                 const no_ob = react_collector.collected.get(this.react_no.id);
                 const yes_count = yes_ob === undefined ? 0 : yes_ob.count - 1;
                 const no_count = no_ob === undefined ? 0 : no_ob.count - 1;
-                const votes_to_pass = this.client.provider.get(
-                    votemsg.guild,
-                    'votes_to_pass',
-                    config.discord.votes_to_pass
-                );
                 this.endVote(
                     votemsg,
                     {

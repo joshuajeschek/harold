@@ -250,7 +250,6 @@ function verifyValue(env, group, setting, value) {
  */
 async function setGuildSetting(guild_id, group, setting, value) {
     const key = `${group}_${setting}`;
-    console.log(key);
 
     // get set user settings
     await mongo().then(async (mongoose) => {
