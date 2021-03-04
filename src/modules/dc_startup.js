@@ -1,12 +1,11 @@
 /** Useful functions that are run at the startup of the discord bot */
 
 const path = require('path');
-const sqlite = require('sqlite');
-const sqlite3 = require('sqlite3');
 const { exit } = require('process');
-const Commando = require('discord.js-commando');
-const config = require('../../config.json');
 require('dotenv').config();
+const { MongoClient } = require('mongodb');
+const { MongoDBProvider } = require('commando-provider-mongo')
+const { compileMongoUrl } = require('./mongo');
 
 module.exports = {
     /**
@@ -30,37 +29,34 @@ module.exports = {
     },
 
     /**
-    * Sets up the client (registry, database)
-    * @param {Commando.Client} dc_client the client to set up
-    */
-   commandoSetup: function (dc_client) {
+     * Sets up the client (registry, database)
+     * @param {Commando.Client} dc_client the client to set up
+     */
+    commandoSetup: function (dc_client) {
         dc_client.registry
             // Registers the custom command groups
             .registerGroups([
                 ['util', 'Utility'],
-                ['vote', 'Voting']
+                ['vote', 'Voting'],
             ])
             // Registers select default commands
             .registerDefaultTypes()
-            .registerDefaultGroups({
-                util: true,
-            })
+            .registerDefaultGroups()
             .registerDefaultCommands({
-                eval: false,
-                commandState: false,
                 ping: false,
-                unknownCommand: false,
+                unknownCommand: false
             })
             // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
         console.log('Loaded these commands:');
         console.log(dc_client.registry.commands.keys());
+        const [ mongo_url, db_name ] = compileMongoUrl()
         dc_client
             .setProvider(
-                sqlite
-                    .open({ filename: 'database.db', driver: sqlite3.Database })
-                    .then((db) => new Commando.SQLiteProvider(db))
+                MongoClient.connect(mongo_url, { useUnifiedTopology: true }).then(
+                    (client) => new MongoDBProvider(client, db_name)
+                )
             )
             .catch(console.error);
-    }
+    },
 };

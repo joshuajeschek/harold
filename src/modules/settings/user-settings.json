@@ -1,0 +1,10 @@
+{
+    "steam": {
+        "rank": {
+            "default": true,
+            "description": "Wether your rank should be public, accessible through roles and the `info` command.",
+            "example": "`set steam rank false`",
+            "value": true
+        }
+    }
+}

@@ -1,0 +1,24 @@
+[
+    {
+        "steam": [
+            "rank"
+        ]
+    },
+    {
+        "voting": [
+            "count"
+        ],
+        "steam": [
+            "roles"
+        ]
+    },
+    {
+        "voting": [
+            "time",
+            "count"
+        ],
+        "steam": [
+            "roles"
+        ]
+    }
+]
