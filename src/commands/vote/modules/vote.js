@@ -31,9 +31,9 @@ module.exports = class VoteCommand extends Command {
      */
     async initializeVote(msg, type, content) {
         // references needed for later
-        this.imgchan = this.client.channels.cache.get(config.discord.imgchan);
-        this.react_yes = this.client.emojis.cache.get(config.discord.emoji.F1);
-        this.react_no = this.client.emojis.cache.get(config.discord.emoji.F2);
+        this.imgchan = this.client.channels.cache.get(config.ids.imgchan);
+        this.react_yes = this.client.emojis.cache.get(config.ids.emoji.F1);
+        this.react_no = this.client.emojis.cache.get(config.ids.emoji.F2);
 
         // the one who started the vote
         const starter = shortenStarterName(msg.author.username);

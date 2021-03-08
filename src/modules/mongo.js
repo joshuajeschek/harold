@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config.json');
 const { exit } = require('process');
-
 let mongo_url;
 
 const compileMongoUrl = function() {
@@ -10,7 +8,7 @@ const compileMongoUrl = function() {
         console.log(`Invalid app provided. [${process.argv[2]}`);
         exit(1);
     }
-    let url = config.discord.mongourl;
+    let url = process.env.MONGO_URL;
     url = url.replace('<name>', process.env.MONGO_NAME);
     url = url.replace('<password>', process.env.MONGO_PASSWORD);
     switch (app) {

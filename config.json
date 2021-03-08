@@ -1,17 +1,14 @@
 {
+    "prefix": "/",
     "images": {
         "settings": "https://cdn.discordapp.com/attachments/815232183387029534/815235613795549224/settings.png"
     },
-    "global": null,
-    "discord": {
-        "prefix": "/",
+    "ids": {
         "owner": "456794073194561538",
         "imgchan": "813551053844643860",
         "emoji": {
             "F1": "813568468511096845",
             "F2": "813568468783595620"
-        },
-        "mongourl": "mongodb+srv://<name>:<password>@harold.rluso.mongodb.net/<app>?retryWrites=true&w=majority"
-    },
-    "steam": null
+        }
+    }
 }

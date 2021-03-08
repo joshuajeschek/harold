@@ -280,7 +280,7 @@ async function setGuildSetting(guild_id, group, setting, value) {
             else { // initial document needs prefix
                 data = {
                     settings: {
-                        prefix: config.discord.prefix,
+                        prefix: config.prefix,
                     },
                     [key]: value,
                 };

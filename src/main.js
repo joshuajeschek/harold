@@ -7,8 +7,8 @@ const HaroldClient = require('./modules/harold_client');
 
 // instantiate a new harold client (discord + steam)
 const harold = new HaroldClient({
-    commandPrefix: config.discord.prefix,
-    owner: config.discord.owner,
+    commandPrefix: config.prefix,
+    owner: config.ids.owner,
 });
 
 // setup discord and steam (login)
