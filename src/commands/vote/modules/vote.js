@@ -44,7 +44,7 @@ module.exports = class VoteCommand extends Command {
             starter,
             content,
             0,
-            0
+            0,
         );
 
         // url to put in the embed
@@ -56,7 +56,7 @@ module.exports = class VoteCommand extends Command {
         const embed = new MessageEmbed()
             .setImage(imgurl)
             .setFooter(
-                `Vote by ${starter}, ${minutes_to_vote} minutes to vote.`
+                `Vote by ${starter}, ${minutes_to_vote} minutes to vote.`,
             )
             .setColor([37, 37, 37]);
 
@@ -67,7 +67,7 @@ module.exports = class VoteCommand extends Command {
         await votemsg.react(this.react_yes);
         await votemsg.react(this.react_no);
 
-        //clean up ( only sent file, not template )
+        // clean up ( only sent file, not template )
         deleteFile(`${filename}`);
 
         return { votemsg, template_filename };
@@ -105,35 +105,37 @@ module.exports = class VoteCommand extends Command {
             // only emit update when no reaction is removed,
             // as it will fire in that case
             switch (reaction.emoji) {
-                case this.react_yes:
-                    if (
-                        reaction_cache
-                            .get(this.react_no.id)
-                            .users.cache.has(user.id)
-                    ) {
-                        reaction_cache.get(this.react_no.id).users.remove(user);
-                    } else {
-                        react_collector.emit('update');
-                    }
-                    break;
+            case this.react_yes:
+                if (
+                    reaction_cache
+                        .get(this.react_no.id)
+                        .users.cache.has(user.id)
+                ) {
+                    reaction_cache.get(this.react_no.id).users.remove(user);
+                }
+                else {
+                    react_collector.emit('update');
+                }
+                break;
 
-                case this.react_no:
-                    if (
-                        reaction_cache
-                            .get(this.react_yes.id)
-                            .users.cache.has(user.id)
-                    ) {
-                        reaction_cache
-                            .get(this.react_yes.id)
-                            .users.remove(user);
-                    } else {
-                        react_collector.emit('update');
-                    }
-                    break;
+            case this.react_no:
+                if (
+                    reaction_cache
+                        .get(this.react_yes.id)
+                        .users.cache.has(user.id)
+                ) {
+                    reaction_cache
+                        .get(this.react_yes.id)
+                        .users.remove(user);
+                }
+                else {
+                    react_collector.emit('update');
+                }
+                break;
 
-                default:
-                    // should never occur
-                    break;
+            default:
+                // should never occur
+                break;
             }
         });
 
@@ -159,20 +161,21 @@ module.exports = class VoteCommand extends Command {
                     votemsg,
                     {
                         yes_count,
-                        no_count
+                        no_count,
                     },
                     template_filename,
-                    votes_to_pass
+                    votes_to_pass,
                 );
-            } else {
+            }
+            else {
                 // update the embed with the right amount of votes
                 this.updateEmbed(
                     votemsg,
                     {
                         yes_count,
-                        no_count
+                        no_count,
                     },
-                    template_filename
+                    template_filename,
                 );
             }
         });
@@ -190,10 +193,10 @@ module.exports = class VoteCommand extends Command {
                     votemsg,
                     {
                         yes_count,
-                        no_count
+                        no_count,
                     },
                     template_filename,
-                    votes_to_pass
+                    votes_to_pass,
                 );
             }
         });
@@ -214,7 +217,8 @@ module.exports = class VoteCommand extends Command {
         if (data.yes_count >= votes_to_pass) {
             state = 'pass';
             emb_color = [0, 128, 0];
-        } else if (data.no_count >= votes_to_pass) {
+        }
+        else if (data.no_count >= votes_to_pass) {
             state = 'fail';
         }
 
@@ -223,7 +227,7 @@ module.exports = class VoteCommand extends Command {
             template_filename,
             state,
             data.yes_count,
-            data.no_count
+            data.no_count,
         );
 
         // post the new image
@@ -246,7 +250,7 @@ module.exports = class VoteCommand extends Command {
         const filename = await changeValues(
             template_filename,
             data.yes_count,
-            data.no_count
+            data.no_count,
         );
 
         const imgurl = await this.getImageUrl(filename);
@@ -274,7 +278,7 @@ module.exports = class VoteCommand extends Command {
             ],
         });
 
-        //return only the url
+        // return only the url
         return imgmsg.attachments.first().url;
     }
 };

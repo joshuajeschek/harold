@@ -7,8 +7,8 @@ module.exports = class VotekickCommand extends VoteCommand {
             group: 'vote',
             aliases: ['sur'],
             memberName: 'surrender',
-            description: "Do you really wanna surrender? There's always a chance to come back!",
-            examples: ['surrender']
+            description: 'Do you really wanna surrender? There\'s always a chance to come back!',
+            examples: ['surrender'],
         });
     }
 
@@ -19,7 +19,7 @@ module.exports = class VotekickCommand extends VoteCommand {
         const { votemsg, template_filename } = await this.initializeVote(
             msg,
             'surrender',
-            `Surrender?`
+            'Surrender?',
         );
 
         await this.countVotes(votemsg, template_filename);

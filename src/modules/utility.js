@@ -1,17 +1,18 @@
 const { unlink } = require('fs');
+const { exit } = require('process');
 const config = require('../../');
 
-const capitalizeFirstLetter = function (string) {
+const capitalizeFirstLetter = function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
-}
+};
 
-const deleteFile = async function (path) {
+const deleteFile = async function(path) {
     unlink(path, (err) => {
         if (err) {
             console.error(err);
         }
     });
-}
+};
 
 const compileMongoUrl = function() {
     const app = process.argv[2];
@@ -23,22 +24,22 @@ const compileMongoUrl = function() {
     url = url.replace('<name>', process.env.MONGO_NAME);
     url = url.replace('<password>', process.env.MONGO_PASSWORD);
     switch (app) {
-        case 'T':
-            url = url.replace('<app>', 'chester'); 
-            return [ url, 'chester' ];
-    
-        case 'H':
-            url = url.replace('<app>', 'harold'); 
-            return [ url, 'harold' ];
+    case 'T':
+        url = url.replace('<app>', 'chester');
+        return [ url, 'chester' ];
 
-        default:
-            // should never occur
-            break;
+    case 'H':
+        url = url.replace('<app>', 'harold');
+        return [ url, 'harold' ];
+
+    default:
+        // should never occur
+        break;
     }
-}
+};
 
 module.exports = {
     capitalizeFirstLetter,
     deleteFile,
-    compileMongoUrl    
-}
+    compileMongoUrl,
+};

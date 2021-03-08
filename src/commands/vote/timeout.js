@@ -8,7 +8,7 @@ module.exports = class VotekickCommand extends VoteCommand {
             aliases: ['to'],
             memberName: 'timeout',
             description: 'Call a tactical timeout',
-            examples: ['timeout']
+            examples: ['timeout'],
         });
     }
 
@@ -19,7 +19,7 @@ module.exports = class VotekickCommand extends VoteCommand {
         const { votemsg, template_filename } = await this.initializeVote(
             msg,
             'timeout',
-            `Call a timeout?`
+            'Call a timeout?',
         );
 
         await this.countVotes(votemsg, template_filename);

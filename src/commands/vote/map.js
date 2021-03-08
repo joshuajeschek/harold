@@ -8,7 +8,7 @@ function shortenName(name) {
     if (name.length > 100) {
         name = name.substr(0, 96) + '...';
     }
-    var arr = name.split(' ');
+    const arr = name.split(' ');
     arr.forEach((item, index) => {
         if (item.length > 18) {
             arr[index] = item.substr(0, 14) + '...';
@@ -47,7 +47,7 @@ module.exports = class VotekickCommand extends VoteCommand {
         const { votemsg, template_filename } = await this.initializeVote(
             msg,
             'map',
-            `Change map to ${mapname}?`
+            `Change map to ${mapname}?`,
         );
 
         await this.countVotes(votemsg, template_filename);

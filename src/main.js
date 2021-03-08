@@ -9,13 +9,16 @@ const harold = new HaroldClient();
 if (process.argv.length < 2) {
     console.log('Please specify an application [H/T]');
     exit(1);
-} else if (process.argv[2] == 'H') {
+}
+else if (process.argv[2] == 'H') {
     console.log('Logging in as BOT Harold');
     harold.connect(process.env.HAROLD_TOKEN);
-} else if (process.argv[2] == 'T') {
+}
+else if (process.argv[2] == 'T') {
     console.log('Logging in as Chester McTester');
     harold.connect(process.env.TESTBOT_TOKEN);
-} else {
+}
+else {
     console.log(`Invalid app provided. [${process.argv[2]}`);
     exit(1);
 }

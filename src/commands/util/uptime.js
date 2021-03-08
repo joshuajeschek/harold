@@ -7,14 +7,14 @@ module.exports = class UptimeCommand extends Commando.Command {
             aliases: ['up'],
             group: 'util',
             memberName: 'uptime',
-            description: "Returns the bots' uptime",
+            description: 'Returns the bots\' uptime',
             examples: ['uptime'],
         });
     }
 
     async run(msg) {
-        var uptime = this.client.uptime;
-        var time = {
+        const uptime = this.client.uptime;
+        const time = {
             days: Math.floor(uptime / (1000 * 60 * 60 * 24)),
             hours: Math.floor(uptime / (1000 * 60 * 60)),
             minutes: Math.floor(uptime / (1000 * 60)),
@@ -22,7 +22,7 @@ module.exports = class UptimeCommand extends Commando.Command {
         };
         console.log(`[${msg.createdTimestamp}] [CMD] [${this.name}] ${msg.content}`);
         return msg.channel.send(
-            `I have been online for ${time.days}d, ${time.hours}h, ${time.minutes}m and ${time.seconds}s`
+            `I have been online for ${time.days}d, ${time.hours}h, ${time.minutes}m and ${time.seconds}s`,
         );
     }
 };

@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const Commando = require('discord.js-commando');
 const config = require('../../config.json');
 const SteamInteraction = require('./steam/steam_interaction');
@@ -6,7 +6,7 @@ const { FriendlyError } = require('discord.js-commando');
 const { compileMongoUrl } = require('./mongo');
 const path = require('path');
 const { MongoClient } = require('mongodb');
-const { MongoDBProvider } = require('commando-provider-mongo')
+const { MongoDBProvider } = require('commando-provider-mongo');
 
 
 class HaroldClient {
@@ -19,14 +19,14 @@ class HaroldClient {
         this.steam_client = new SteamInteraction();
     }
 
-    connect (token) {
+    connect(token) {
         this.steam_client.connect();
         this.discordEvents();
         this.commandoSetup();
         this.dc_client.login(token);
     }
 
-    discordEvents () {
+    discordEvents() {
         /* Logs if bot is ready */
         this.dc_client.on('ready', () => {
             console.log(`💬 Logged in as ${this.dc_client.user.tag}!`);
@@ -48,7 +48,7 @@ class HaroldClient {
         });
     }
 
-    commandoSetup () {
+    commandoSetup() {
         this.dc_client.registry
             // Registers the custom command groups
             .registerGroups([
@@ -60,18 +60,18 @@ class HaroldClient {
             .registerDefaultGroups()
             .registerDefaultCommands({
                 ping: false,
-                unknownCommand: false
+                unknownCommand: false,
             })
             // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
         console.log('Loaded these commands:');
         console.log(this.dc_client.registry.commands.keys());
-        const [ mongo_url, db_name ] = compileMongoUrl()
+        const [ mongo_url, db_name ] = compileMongoUrl();
         this.dc_client
             .setProvider(
                 MongoClient.connect(mongo_url, { useUnifiedTopology: true }).then(
-                    (client) => new MongoDBProvider(client, db_name)
-                )
+                    (client) => new MongoDBProvider(client, db_name),
+                ),
             )
             .catch(console.error);
     }

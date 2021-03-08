@@ -5,7 +5,7 @@ const GlobalOffensive = require('globaloffensive');
 require('dotenv').config();
 
 class SteamInteraction extends SteamUser {
-    connect () {
+    connect() {
         this.csgo = new GlobalOffensive(this);
 
         this.on('loggedOn', () => {
@@ -24,16 +24,16 @@ class SteamInteraction extends SteamUser {
 
         this.logOn({
             accountName: process.env.STEAM_NAME,
-            password: process.env.STEAM_PASSWORD
+            password: process.env.STEAM_PASSWORD,
         });
     }
 
-    getPlayerInfo (steamID, callback) {
+    getPlayerInfo(steamID, callback) {
         if(!this.csgo.haveGCSession) return undefined;
 
         this.csgo.requestPlayersProfile(steamID, (profile) => {
             callback(profile);
-        })
+        });
     }
 }
 
