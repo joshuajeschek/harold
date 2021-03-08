@@ -77,6 +77,20 @@ class HaroldClient extends Client {
             console.log(error);
         });
 
+        this.steam.on('friendRelationship', (sid, relationship) => {
+            if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
+                console.log('Got request from ' + sid);
+                this.steam.addFriend(sid, (err) => {
+                    if (err) {
+                        console.log('An error occured while adding ' + sid);
+                    }
+                    else {
+                        console.log('Befriended ' + sid);
+                    }
+                });
+            }
+        });
+
         this.steam.logOn({
             accountName,
             password,
