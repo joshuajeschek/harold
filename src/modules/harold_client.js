@@ -1,79 +1,94 @@
 'use strict';
-const Commando = require('discord.js-commando');
-const config = require('../../config.json');
-const SteamInteraction = require('./steam/steam_interaction');
-const { FriendlyError } = require('discord.js-commando');
-const { compileMongoUrl } = require('./mongo');
 const path = require('path');
+
+const { Client, FriendlyError } = require('discord.js-commando');
 const { MongoClient } = require('mongodb');
 const { MongoDBProvider } = require('commando-provider-mongo');
 
+const SteamUser = require('steam-user');
+const GlobalOffensive = require('globaloffensive');
 
-class HaroldClient {
-    constructor() {
-        this.dc_client = new Commando.Client({
-            owner: config.discord.owner,
-            commandPrefix: config.discord.prefix,
-        });
+const { compileMongoUrl } = require('./mongo');
 
-        this.steam_client = new SteamInteraction();
-    }
 
-    connect(token) {
-        this.steam_client.connect();
-        this.discordEvents();
-        this.commandoSetup();
-        this.dc_client.login(token);
-    }
-
-    discordEvents() {
-        /* Logs if bot is ready */
-        this.dc_client.on('ready', () => {
-            console.log(`💬 Logged in as ${this.dc_client.user.tag}!`);
-            this.dc_client.user.setActivity('Counter-Strike: Global Offensive', {
-                type: 'PLAYING',
-            });
-        });
-
-        /* Logging of DM Messages */
-        this.dc_client.on('message', (msg) => {
-            if (msg.channel.type === 'dm' && msg.author != this.dc_client.user) {
-                console.log(`>>> [DM] ${msg.author.tag}: ${msg.content}`);
-            }
-        });
-
-        this.dc_client.on('commandError', (cmd, err) => {
-            if (err instanceof FriendlyError) return;
-            console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
-        });
-    }
-
-    commandoSetup() {
-        this.dc_client.registry
-            // Registers the custom command groups
+class HaroldClient extends Client {
+    discordSetup() {
+        this.registry
+        // Registers the custom command groups
             .registerGroups([
                 ['util', 'Utility'],
                 ['vote', 'Voting'],
             ])
-            // Registers select default commands
+        // Registers select default commands
             .registerDefaultTypes()
             .registerDefaultGroups()
             .registerDefaultCommands({
                 ping: false,
                 unknownCommand: false,
             })
-            // Registers all of the commands in the ./commands/ directory
+        // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
+
         console.log('Loaded these commands:');
-        console.log(this.dc_client.registry.commands.keys());
+
+        console.log(this.registry.commands.keys());
         const [ mongo_url, db_name ] = compileMongoUrl();
-        this.dc_client
+        this
             .setProvider(
                 MongoClient.connect(mongo_url, { useUnifiedTopology: true }).then(
                     (client) => new MongoDBProvider(client, db_name),
                 ),
             )
             .catch(console.error);
+
+        // EVENT LISTENERS //
+        this.on('ready', () => {
+            console.log(`💬 Logged in as ${this.user.tag}!`);
+            this.user.setActivity('Counter-Strike: Global Offensive', {
+                type: 'PLAYING',
+            });
+        });
+
+        /* Logging of DM Messages */
+        this.on('message', (msg) => {
+            if (msg.channel.type === 'dm' && msg.author != this.user) {
+                console.log(`>>> [DM] ${msg.author.tag}: ${msg.content}`);
+            }
+        });
+
+        /* Friendly Error Logging */
+        this.on('commandError', (cmd, err) => {
+            if (err instanceof FriendlyError) return;
+            console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
+        });
+    }
+
+    connectToSteam(accountName, password) {
+        this.steam = new SteamUser();
+
+        // EVENT LISTENERS //
+        this.steam.on('loggedOn', () => {
+            this.steam.setPersona(SteamUser.EPersonaState.Online);
+            this.steam.gamesPlayed(730);
+            console.log('🎮 successfully logged onto steam as ' + this.steam._logOnDetails.account_name);
+        });
+
+        this.steam.on('error', (error) => {
+            console.log(error);
+        });
+
+        this.steam.logOn({
+            accountName,
+            password,
+        });
+    }
+
+    connectToCSGO() {
+        this.csgo = this.csgo = new GlobalOffensive(this.steam);
+
+        this.csgo.on('connectedToGC', () => {
+            console.log('🎮 Connected to Game Coordinator');
+        });
     }
 }
 
