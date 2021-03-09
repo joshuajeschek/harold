@@ -4,7 +4,7 @@ const pw_gen = require('generate-password');
 
 const connect_embed = require('./connect-embed.json');
 
-module.exports = class PingCommand extends Commando.Command {
+module.exports = class ConnectCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'connect',
