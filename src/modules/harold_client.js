@@ -85,18 +85,42 @@ class HaroldClient extends Client {
         });
 
         this.steam.on('friendRelationship', (sid, relationship) => {
+            // user requested
             if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
                 console.log('Got request from ' + sid);
-                this.steam.addFriend(sid, (err) => {
-                    if (err) {
-                        console.log('An error occured while adding ' + sid);
-                    }
-                    else {
-                        console.log('Befriended ' + sid);
-                    }
-                });
+                this.steamBefriend(sid);
+            }
+            // unfriended
+            else if (relationship == SteamUser.EFriendRelationship.None) {
+                console.log('Got unfriended by ' + sid);
+                /* TODO
+                    - delete entries in database
+                    - notify the user on discord
+                    - delete connected roles (automatic on refresh?)
+                */
+            }
+            // befriended
+            else if (relationship == SteamUser.EFriendRelationship.Friend) {
+                console.log('Befriended ' + sid);
+                this.steam.chatMessage(
+                    sid,
+                    'Hey, thanks for adding me! ' +
+                    'I am currently in development',
+                    // 'Please state your private token. ' +
+                    // 'If you dont have a token, use the <color=green>connect</color> command on Discord.',
+                );
             }
         });
+
+        this.steam.on('firendList', () => {
+            for (const [sid, relationship] in this.steam.myFriends) {
+                if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
+                    console.log('Got request from ' + sid);
+                    this.steamBefriend(sid);
+                }
+            }
+        });
+
 
         this.steam.logOn({
             accountName,
@@ -109,6 +133,14 @@ class HaroldClient extends Client {
 
         this.csgo.on('connectedToGC', () => {
             console.log('🎮 Connected to Game Coordinator');
+        });
+    }
+
+    steamBefriend(sid) {
+        this.steam.addFriend(sid, (err) => {
+            if (err) {
+                console.log('An error occured while adding ' + sid);
+            }
         });
     }
 }
