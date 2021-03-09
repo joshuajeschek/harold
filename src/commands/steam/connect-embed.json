@@ -1,6 +1,6 @@
 {
   "title": "Let's connect on steam!",
-  "description": "To connect, simply add me on Steam: [BOT Harold](https://steamcommunity.com/id/bot-harold/)\n and send me a message containing the private token. This connection request will automatically cancel itself in 30 minutes.",
+  "description": "To connect, simply add me on Steam:\n\t :bust_in_silhouette: [BOT Harold](https://steamcommunity.com/id/bot-harold/)\n and send me a message containing the private token. This connection request will automatically cancel itself in 15 minutes.",
   "color": 6124678,
   "thumbnail": {
     "url": "https://media.discordapp.net/attachments/815232183387029534/818633363980156958/steam.png"

@@ -67,6 +67,6 @@ module.exports = class ConnectCommand extends Commando.Command {
                 'If there were and problems, please contact ' + `${this.client.owners[0]}`);
                 this.client.steam.removeListener('friendMessage', receivedDM);
             }
-        }, 30 * 60 * 1000);
+        }, 15 * 60 * 1000);
     }
 };
