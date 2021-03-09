@@ -73,7 +73,7 @@ async function setSteamIDs(DiscordID, steam_id) {
         }
     });
 
-    return [SteamID64, AccountID];
+    return { SteamID64, AccountID };
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 {
     "title": "Connection successfull!",
-    "description": "You are now connected to me via steam. \n In Discord Guilds that support it, your rank will be displayed in form of a role, and you will be able to access information about you CS:GO account.",
+    "description": "You are now connected to me via steam. \n In Discord Guilds that support it, your rank will be displayed in form of a role, and you will be able to access information about your CS:GO account.\nThis obviously requires a CS:GO account.",
     "color": 32768,
     "thumbnail": {
       "url": "https://cdn.discordapp.com/attachments/815232183387029534/818904356962566165/F1.png"

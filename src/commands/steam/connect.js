@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
-const pw_gen = require('generate-password');
+const PasswordGenerator = require('generate-password');
 
 const connect_embed = require('./resources/connect-embed.json');
 const success_embed = require('./resources/success-embed.json');
@@ -36,21 +36,23 @@ module.exports = class ConnectCommand extends Commando.Command {
             return;
         }
 
+        const con_embed = new MessageEmbed(connect_embed);
+
         // check if connection already exists
-        const { SteamID64 } = await getSteamIDs(msg.author.id);
-        if (SteamID64) {
-            msg.author.dmChannel.send('**NOTE:** You are already connected on steam. ' +
-            'If you want to connect with another account, you will lose connection to the first account.');
+        if ((await getSteamIDs(msg.author.id)).SteamID64) {
+            con_embed.addField(
+                ':exclamation: Connection already exists! :exclamation:',
+                '***If you connect a new account, the old connection will be lost.***',
+            );
         }
 
-        const token = pw_gen.generate({
+        const token = PasswordGenerator.generate({
             length: 7,
             numbers: true,
             lowercase: false,
             strict: true,
         });
 
-        const con_embed = new MessageEmbed(connect_embed);
         con_embed.addField(
             'Your private token (click to reveal):',
             `||${token}||`,
@@ -61,27 +63,53 @@ module.exports = class ConnectCommand extends Commando.Command {
         let receivedToken = false;
 
         const steam_client = this.client.steam;
+        const discord_client = this.client;
 
-        function receivedDM(senderID, message) {
+        /**
+         * Called when the bot receives a message
+         * @param {String} senderID id of message sender
+         * @param {String} message content of message
+         */
+        async function receivedDM(senderID, message) {
+            // TOKEN RECEIVED
             if (message.includes(token)) {
+
+                // prevent more receiving
                 receivedToken = true;
                 steam_client.removeListener('friendMessage', receivedDM);
-                const suc_embed = new MessageEmbed(success_embed);
+
+                const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, `${senderID}`);
+                if (!SteamID64 || !AccountID) {
+                    msg.author.dmChannel.send(
+                        'Something went wrong ' +
+                        'Please try again later. ' +
+                        'If this keeps happening consider contacting ' +
+                        `${discord_client.owners[0]}`,
+                    );
+                }
+
+                // data for response embed
                 const player_name = steam_client.users[senderID].player_name;
                 const avatar_url = steam_client.users[senderID].avatar_url_full;
-                suc_embed.addField(
-                    'Connected account:',
-                    `:bust_in_silhouette: [${player_name}](https://steamcommunity.com/id/${senderID})`,
-                );
-                suc_embed.setThumbnail(avatar_url);
+
+                // compile response embed
+                const suc_embed = new MessageEmbed(success_embed)
+                    .addField(
+                        'Connected account:',
+                        `:bust_in_silhouette: [${player_name}](https://steamcommunity.com/id/${senderID})`,
+                    )
+                    .setThumbnail(avatar_url);
+
+                // send confirmations
                 msg.author.dmChannel.send(suc_embed);
                 steam_client.chatMessage(senderID, 'We are now connected!');
-                setSteamIDs(msg.author.id, `${senderID}`);
             }
         }
 
+        // listen for DMs
         this.client.steam.addListener('friendMessage', receivedDM);
 
+        // timed listener, stop after 15 minutes
         setTimeout(() => {
             if (!receivedToken) {
                 const fa_embed = new MessageEmbed(fail_embed);
