@@ -30,7 +30,7 @@ class HaroldClient extends Client {
         // Registers all of the commands in the ./commands/ directory
             .registerCommandsIn(path.join(__dirname, '../commands'));
 
-        console.log('Loaded these commands:');
+        console.log('💬 Loaded these commands:');
 
         console.log(this.registry.commands.keys());
         const [ mongo_url, db_name ] = compileMongoUrl();
@@ -60,7 +60,7 @@ class HaroldClient extends Client {
         /* Friendly Error Logging */
         this.on('commandError', (cmd, err) => {
             if (err instanceof FriendlyError) return;
-            console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
+            console.error(`💬 Error in command ${cmd.groupID}:${cmd.memberName}`, err);
         });
     }
 
@@ -76,7 +76,7 @@ class HaroldClient extends Client {
         });
 
         this.steam.on('disconnected', (_, msg) => {
-            console.log('Disconneted, reason: ' + msg);
+            console.log('🎮 Disconnected, reason: ' + msg);
             this.steam.isOnline = false;
         });
 
@@ -87,12 +87,12 @@ class HaroldClient extends Client {
         this.steam.on('friendRelationship', (sid, relationship) => {
             // user requested
             if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
-                console.log('Got request from ' + sid);
+                console.log('🎮 Got request from ' + sid);
                 this.steamBefriend(sid);
             }
             // unfriended
             else if (relationship == SteamUser.EFriendRelationship.None) {
-                console.log('Got unfriended by ' + sid);
+                console.log('🎮 Got unfriended by ' + sid);
                 /* TODO
                     - delete entries in database
                     - notify the user on discord
@@ -102,13 +102,12 @@ class HaroldClient extends Client {
             }
             // befriended
             else if (relationship == SteamUser.EFriendRelationship.Friend) {
-                console.log('Befriended ' + sid);
+                console.log('🎮 Befriended ' + sid);
                 this.steam.chatMessage(
                     sid,
                     'Hey, thanks for adding me! ' +
-                    'I am currently in development.',
-                    // '\nPlease state your private token. ' +
-                    // '\nIf you dont have a token, use the `connect` command on Discord.',
+                    '\nPlease state your private token. ' +
+                    '\nIf you dont have a token, use the `connect` command on Discord.',
                 );
             }
         });
@@ -116,7 +115,7 @@ class HaroldClient extends Client {
         this.steam.on('friendsList', () => {
             for (const [sid, relationship] of Object.entries(this.steam.myFriends)) {
                 if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
-                    console.log('Got request from ' + sid);
+                    console.log('🎮 Got request from ' + sid);
                     this.steamBefriend(sid);
                 }
             }
@@ -148,7 +147,7 @@ class HaroldClient extends Client {
     steamBefriend(sid) {
         this.steam.addFriend(sid, (err) => {
             if (err) {
-                console.log('An error occured while adding ' + sid);
+                console.log('🎮 An error occured while adding ' + sid);
             }
         });
     }
