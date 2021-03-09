@@ -1,0 +1,14 @@
+{
+  "title": "Let's connect on steam!",
+  "description": "To connect, simply add me on Steam: [BOT Harold](https://steamcommunity.com/id/bot-harold/)\n and send me a message containing the private token. This connection request will automatically cancel itself in 30 minutes.",
+  "color": 6124678,
+  "thumbnail": {
+    "url": "https://media.discordapp.net/attachments/815232183387029534/818633363980156958/steam.png"
+  },
+  "fields": [
+    {
+      "name": "privacy notice",
+      "value": "None of your private data will be accessed or stored. I can only access as much data, as any of you other steam friends can.\nPeople in discord servers may use commands to find out your CS:GO skill group, but you can toggle this with the `settings` command. This will be accessed:\n\t▸ Your CS:GO skill group / rank\n\t▸ CS:GO stats such as wins, defeats, K/D, number of shots fired, all of that interesting stuff."
+    }
+  ]
+}

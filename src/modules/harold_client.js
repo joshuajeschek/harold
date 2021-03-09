@@ -18,6 +18,7 @@ class HaroldClient extends Client {
             .registerGroups([
                 ['util', 'Utility'],
                 ['vote', 'Voting'],
+                ['steam', 'Steam'],
             ])
         // Registers select default commands
             .registerDefaultTypes()
@@ -71,6 +72,12 @@ class HaroldClient extends Client {
             this.steam.setPersona(SteamUser.EPersonaState.Online);
             this.steam.gamesPlayed(730);
             console.log('🎮 successfully logged onto steam as ' + this.steam._logOnDetails.account_name);
+            this.steam.isOnline = true;
+        });
+
+        this.steam.on('disconnected', (_, msg) => {
+            console.log('Disconneted, reason: ' + msg);
+            this.steam.isOnline = false;
         });
 
         this.steam.on('error', (error) => {
