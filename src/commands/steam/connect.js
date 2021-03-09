@@ -2,7 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
 const pw_gen = require('generate-password');
 
-const connect_embed = require('./connect-embed.json');
+const connect_embed = require('./resources/connect-embed.json');
 
 module.exports = class ConnectCommand extends Commando.Command {
     constructor(client) {
