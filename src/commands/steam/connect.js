@@ -3,6 +3,9 @@ const Commando = require('discord.js-commando');
 const pw_gen = require('generate-password');
 
 const connect_embed = require('./resources/connect-embed.json');
+const success_embed = require('./resources/success-embed.json');
+const fail_embed = require('./resources/fail-embed.json');
+const { getSteamIDs, setSteamIDs } = require('../../modules/steam/id-lookup');
 
 module.exports = class ConnectCommand extends Commando.Command {
     constructor(client) {
@@ -33,6 +36,13 @@ module.exports = class ConnectCommand extends Commando.Command {
             return;
         }
 
+        // check if connection already exists
+        const { SteamID64 } = await getSteamIDs(msg.author.id);
+        if (SteamID64) {
+            msg.author.dmChannel.send('**NOTE:** You are already connected on steam. ' +
+            'If you want to connect with another account, you will lose connection to the first account.');
+        }
+
         const token = pw_gen.generate({
             length: 7,
             numbers: true,
@@ -40,22 +50,33 @@ module.exports = class ConnectCommand extends Commando.Command {
             strict: true,
         });
 
-        const embed = new MessageEmbed(connect_embed);
-        embed.addField(
+        const con_embed = new MessageEmbed(connect_embed);
+        con_embed.addField(
             'Your private token (click to reveal):',
             `||${token}||`,
         );
 
-        msg.author.dmChannel.send(embed);
+        msg.author.dmChannel.send(con_embed);
 
         let receivedToken = false;
 
+        const steam_client = this.client.steam;
+
         function receivedDM(senderID, message) {
-            console.log(senderID, message);
             if (message.includes(token)) {
                 receivedToken = true;
-                msg.author.dmChannel.send('We are now connected on steam!');
-                this.client.steam.removeListener('friendMessage', receivedDM);
+                steam_client.removeListener('friendMessage', receivedDM);
+                const suc_embed = new MessageEmbed(success_embed);
+                const player_name = steam_client.users[senderID].player_name;
+                const avatar_url = steam_client.users[senderID].avatar_url_full;
+                suc_embed.addField(
+                    'Connected account:',
+                    `:bust_in_silhouette: [${player_name}](https://steamcommunity.com/id/${senderID})`,
+                );
+                suc_embed.setThumbnail(avatar_url);
+                msg.author.dmChannel.send(suc_embed);
+                steam_client.chatMessage(senderID, 'We are now connected!');
+                setSteamIDs(msg.author.id, `${senderID}`);
             }
         }
 
@@ -63,8 +84,8 @@ module.exports = class ConnectCommand extends Commando.Command {
 
         setTimeout(() => {
             if (!receivedToken) {
-                msg.author.dmChannel.send(':clock: Your connection request timed out. ' +
-                'If there were and problems, please contact ' + `${this.client.owners[0]}`);
+                const fa_embed = new MessageEmbed(fail_embed);
+                msg.author.dmChannel.send(fa_embed);
                 this.client.steam.removeListener('friendMessage', receivedDM);
             }
         }, 15 * 60 * 1000);

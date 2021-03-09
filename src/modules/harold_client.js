@@ -97,6 +97,7 @@ class HaroldClient extends Client {
                     - delete entries in database
                     - notify the user on discord
                     - delete connected roles (automatic on refresh?)
+                    - IS ALSO EMITTED ON BLOCKS
                 */
             }
             // befriended
@@ -105,15 +106,15 @@ class HaroldClient extends Client {
                 this.steam.chatMessage(
                     sid,
                     'Hey, thanks for adding me! ' +
-                    'I am currently in development',
-                    // 'Please state your private token. ' +
-                    // 'If you dont have a token, use the <color=green>connect</color> command on Discord.',
+                    'I am currently in development.',
+                    // '\nPlease state your private token. ' +
+                    // '\nIf you dont have a token, use the `connect` command on Discord.',
                 );
             }
         });
 
-        this.steam.on('firendList', () => {
-            for (const [sid, relationship] in this.steam.myFriends) {
+        this.steam.on('friendsList', () => {
+            for (const [sid, relationship] of Object.entries(this.steam.myFriends)) {
                 if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
                     console.log('Got request from ' + sid);
                     this.steamBefriend(sid);
@@ -121,6 +122,14 @@ class HaroldClient extends Client {
             }
         });
 
+        this.steam.on('friendMessage#76561198814489169', (steamID, message) => {
+            if (message.startsWith('echo')) {
+                this.steam.chatMessage(
+                    steamID,
+                    message,
+                );
+            }
+        });
 
         this.steam.logOn({
             accountName,
