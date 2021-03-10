@@ -1,5 +1,5 @@
+'use strict';
 const Commando = require('discord.js-commando');
-
 const { MessageCollector } = require('discord.js');
 
 const { getSteamIDs, deleteEntry } = require('../../modules/steam/id-lookup');
@@ -15,24 +15,30 @@ module.exports = class ConnectCommand extends Commando.Command {
             memberName: 'disconnect',
             description: 'Disconnect your steam account to miss out on a lot of key features.',
             examples: ['disconnect'],
+            throttling: {
+                usages: 1,
+                duration: 15 * 60,
+            },
         });
     }
 
     async run(msg) {
         console.log('>>> disconnect by ' + msg.author.tag);
 
+        // check if not connected
         const exists = await (await getSteamIDs(msg.author.id)).SteamID64;
-
         if(!exists) {
             msg.reply('You are not connected, so there is no need to disconnect.');
             return;
         }
 
+        // if in guild channel or group chat
         if(msg.channel.type != 'dm') {
             await msg.author.createDM();
             msg.reply('I\'ve sent you a DM');
         }
 
+        // ask for comfirmation
         msg.author.dmChannel.send('Do you really want to disconnect your Steam account and miss out on key features?\n' +
             'Reply to this message with one of these words to confirm your choice:\n`' +
             affirmations.join(', ') + '`\n' +
@@ -40,11 +46,11 @@ module.exports = class ConnectCommand extends Commando.Command {
         );
 
         const filter = m => affirmations.includes(m.content) && m.author.id === msg.author.id;
-
         const m_collector = new MessageCollector(msg.author.dmChannel, filter, { time: 30 * 1000 });
 
         m_collector.on('collect', async (m) => {
             m_collector.stop('collect');
+            // DELETE ENTRY and check if it worked
             if((await deleteEntry(m.author.id))) {
                 m.reply('Successfully disconnected your steam account from this account. It might take a while until the changes take effect.');
             }

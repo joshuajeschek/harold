@@ -1,11 +1,13 @@
+'use strict';
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
 const PasswordGenerator = require('generate-password');
 
+const { getSteamIDs, setSteamIDs } = require('../../modules/steam/id-lookup');
+
 const connect_embed = require('./resources/connect-embed.json');
 const success_embed = require('./resources/success-embed.json');
 const fail_embed = require('./resources/fail-embed.json');
-const { getSteamIDs, setSteamIDs } = require('../../modules/steam/id-lookup');
 
 module.exports = class ConnectCommand extends Commando.Command {
     constructor(client) {
@@ -16,7 +18,45 @@ module.exports = class ConnectCommand extends Commando.Command {
             memberName: 'connect',
             description: 'Connect your steam account, enabeling rank roles and much more!',
             examples: ['connect'],
+            throttling: {
+                usages: 1,
+                duration: 15 * 60,
+            },
         });
+    }
+
+    /**
+     *
+     * @param {String} senderID
+     * @param {Discord.Message} msg
+     * @param {Function} receivedDM Function that was bound to the event
+     */
+    async connectToSteam(senderID, msg) {
+        const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, `${senderID}`);
+        if (!SteamID64 || !AccountID) {
+            msg.author.dmChannel.send(
+                'Something went wrong ' +
+                        'Please try again later. ' +
+                        'If this keeps happening consider contacting ' +
+                        `${this.client.owners}`,
+            );
+        }
+
+        // data for response embed
+        const player_name = this.client.steam.users[senderID].player_name;
+        const avatar_url = this.client.steam.users[senderID].avatar_url_full;
+
+        // compile response embed
+        const suc_embed = new MessageEmbed(success_embed)
+            .addField(
+                'Connected account:',
+                `:bust_in_silhouette: [${player_name}](https://steamcommunity.com/id/${senderID})`,
+            )
+            .setThumbnail(avatar_url);
+
+        // send confirmations
+        msg.author.dmChannel.send(suc_embed);
+        this.client.steam.chatMessage(senderID, 'We are now connected!');
     }
 
     async run(msg) {
@@ -62,52 +102,29 @@ module.exports = class ConnectCommand extends Commando.Command {
 
         let receivedToken = false;
 
-        const steam_client = this.client.steam;
-        const discord_client = this.client;
-
         /**
          * Called when the bot receives a message
          * @param {String} senderID id of message sender
          * @param {String} message content of message
          */
         async function receivedDM(senderID, message) {
+            console.log('Were here');
             // TOKEN RECEIVED
-            if (message.includes(token)) {
+            if (message.includes(token) && !receivedToken) {
 
                 // prevent more receiving
                 receivedToken = true;
-                steam_client.removeListener('friendMessage', receivedDM);
+                this.client.steam.removeListener('friendMessage', boundReceivedDM);
 
-                const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, `${senderID}`);
-                if (!SteamID64 || !AccountID) {
-                    msg.author.dmChannel.send(
-                        'Something went wrong ' +
-                        'Please try again later. ' +
-                        'If this keeps happening consider contacting ' +
-                        `${discord_client.owners[0]}`,
-                    );
-                }
+                this.connectToSteam(senderID, msg);
 
-                // data for response embed
-                const player_name = steam_client.users[senderID].player_name;
-                const avatar_url = steam_client.users[senderID].avatar_url_full;
-
-                // compile response embed
-                const suc_embed = new MessageEmbed(success_embed)
-                    .addField(
-                        'Connected account:',
-                        `:bust_in_silhouette: [${player_name}](https://steamcommunity.com/id/${senderID})`,
-                    )
-                    .setThumbnail(avatar_url);
-
-                // send confirmations
-                msg.author.dmChannel.send(suc_embed);
-                steam_client.chatMessage(senderID, 'We are now connected!');
             }
         }
 
+        const boundReceivedDM = receivedDM.bind(this);
+
         // listen for DMs
-        this.client.steam.addListener('friendMessage', receivedDM);
+        this.client.steam.on('friendMessage', boundReceivedDM);
 
         // timed listener, stop after 15 minutes
         setTimeout(() => {
