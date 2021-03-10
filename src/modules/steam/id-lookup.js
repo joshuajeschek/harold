@@ -18,12 +18,12 @@ async function getSteamIDs(DiscordID) {
         await mongo().then(async (mongoose) => {
             try {
                 const result = await steamIDsSchema.findOne({
-                    DiscordID: DiscordID,
+                    DiscordID,
                 });
                 if (result) {
                     SteamID64 = result.SteamID64;
                     AccountID = result.AccountID;
-                    id_cache[DiscordID] = { SteamID64, AccountID };
+                    id_cache.set(DiscordID, { SteamID64, AccountID });
                 }
             }
             finally {
@@ -50,7 +50,7 @@ async function setSteamIDs(DiscordID, steam_id) {
     const SteamID64 = sid.getSteamID64();
     const AccountID = sid.accountid;
 
-    id_cache[DiscordID] = { SteamID64, AccountID };
+    id_cache.set(DiscordID, { SteamID64, AccountID });
 
     await mongo().then(async (mongoose) => {
         try {
@@ -65,7 +65,7 @@ async function setSteamIDs(DiscordID, steam_id) {
                 new: true,
             });
             if (new_doc) {
-                id_cache[DiscordID] = { SteamID64, AccountID };
+                id_cache.set(DiscordID, { SteamID64, AccountID });
             }
         }
         finally {
@@ -76,7 +76,46 @@ async function setSteamIDs(DiscordID, steam_id) {
     return { SteamID64, AccountID };
 }
 
+async function deleteEntry(DiscordID = false, steam_id = false) {
+    let old_doc;
+    if (DiscordID) {
+        await mongo().then(async (mongoose) => {
+            try {
+                old_doc = await steamIDsSchema.findOneAndDelete({
+                    DiscordID,
+                });
+            }
+            finally {
+                mongoose.connection.close();
+            }
+        });
+    }
+    else if (steam_id) {
+        const sid = new SteamID(steam_id);
+        await mongo().then(async (mongoose) => {
+            try {
+                old_doc = await steamIDsSchema.findOneAndDelete({
+                    SteamID64: sid.SteamID64,
+                });
+            }
+            finally {
+                mongoose.connection.close();
+            }
+        });
+    }
+
+    // successfull access
+    if (old_doc) {
+        id_cache.delete(old_doc.DiscordID);
+        return true;
+    }
+
+    // no parameters or unsuccessfull access
+    return false;
+}
+
 module.exports = {
     getSteamIDs,
     setSteamIDs,
+    deleteEntry,
 };
