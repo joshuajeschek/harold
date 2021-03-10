@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 
 const reqString = {
     type: String,
-    required: true
+    required: true,
 };
 
 const userSettingsSchema = mongoose.Schema({
     user: reqString,
-    steam_rank: Boolean
+    steam_rank: Boolean,
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
 module.exports = mongoose.model('user-settings', userSettingsSchema);

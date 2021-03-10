@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const reqString = {
     type: String,
-    required: true
+    required: true,
 };
 
 const settingsObject = mongoose.Schema({
     prefix: String,
-})
+});
 
 const guildSettingsSchema = mongoose.Schema({
     guild: reqString,
@@ -15,14 +15,14 @@ const guildSettingsSchema = mongoose.Schema({
     voting_time: {
         type: Number,
         min: 0,
-        max: 10
+        max: 10,
     },
     voting_count: {
         type: Number,
         min: 1,
-        max: 99
+        max: 99,
     },
-    steam_roles: Boolean
+    steam_roles: Boolean,
 });
 
 module.exports = mongoose.model('settings', guildSettingsSchema);

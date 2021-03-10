@@ -7,7 +7,7 @@ module.exports = class PingCommand extends Commando.Command {
             aliases: ['p'],
             group: 'util',
             memberName: 'ping',
-            description: "Checks the bots' status",
+            description: 'Checks the bots\' status',
             examples: ['ping'],
         });
     }
@@ -15,7 +15,7 @@ module.exports = class PingCommand extends Commando.Command {
     async run(msg) {
         console.log('>>> ponged');
         return msg.channel.send(
-            `:ping_pong: Pong! My latency is \`${this.client.ws.ping} ms\``
+            `:ping_pong: Pong! My latency is \`${this.client.ws.ping} ms\``,
         );
     }
 };

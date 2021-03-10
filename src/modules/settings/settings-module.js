@@ -5,26 +5,25 @@ const user_defaults = require('./user-settings.json');
 const { mongo } = require('../mongo');
 const guildSettingsSchema = require('./schemas/guildsettings-schema');
 const userSettingsSchema = require('./schemas/usersettings-schema');
-const { commandoSetup } = require('../dc_startup');
 const config = require('../../../config.json');
 
 const true_strings = ['true', 'on', 'yes', '1', 'yeah'];
 const false_strings = ['false', 'off', 'no', '0', 'nope'];
 
 // de_cache for quicker access
-let user_cache = new Map();
-let guild_cache = new Map();
+const user_cache = new Map();
+const guild_cache = new Map();
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 //              GET ALL SETTINGS               //
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 /**
  * returns all the settings of the user, with the given user id
- * @param {String} user_id 
+ * @param {String} user_id
  */
-const getUserSettings = async function (user_id) {
-    let settings = user_defaults;
+const getUserSettings = async function(user_id) {
+    const settings = user_defaults;
 
     // get set user settings
     let user_settings;
@@ -37,11 +36,13 @@ const getUserSettings = async function (user_id) {
                 if (result) {
                     user_settings = user_cache[user_id] = result._doc;
                 }
-            } finally {
+            }
+            finally {
                 mongoose.connection.close();
             }
         });
-    } else {
+    }
+    else {
         user_settings = user_cache[user_id];
     }
 
@@ -52,26 +53,28 @@ const getUserSettings = async function (user_id) {
             if (set_arr.length == 2) {
                 try {
                     settings[set_arr[0]][set_arr[1]].value = value;
-                } catch {}
+                }
+                // eslint-disable-next-line no-empty
+                catch {}
             }
         }
     }
 
     return settings;
 
-}
+};
 
 /**
  * Returns all the available settings, depending on the scope
- * @param {String} guild_id 
- * @param {Number} scope 
+ * @param {String} guild_id
+ * @param {Number} scope
  */
 const getGuildSettings = async function(guild_id, scope) {
-    let settings = guild_defaults;
+    const settings = guild_defaults;
 
     // delete unavailable settings
     for (const group in settings) {
-        for (const setting in settings[group]){
+        for (const setting in settings[group]) {
             if (settings[group][setting].scope > scope) {
                 delete settings[group][setting];
             }
@@ -89,14 +92,16 @@ const getGuildSettings = async function(guild_id, scope) {
                 if (result) {
                     guild_settings = guild_cache[guild_id] = result._doc;
                 }
-            } finally {
+            }
+            finally {
                 mongoose.connection.close();
             }
         });
-    } else {
+    }
+    else {
         guild_settings = guild_cache[guild_id];
     }
-    
+
 
     // merge settings
     if (guild_settings) {
@@ -105,24 +110,25 @@ const getGuildSettings = async function(guild_id, scope) {
             if (set_arr.length == 2) {
                 try {
                     settings[set_arr[0]][set_arr[1]].value = value;
-                } catch {}
+                }
+                catch {/* ... */}
             }
         }
     }
 
     return settings;
 
-}
+};
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 //            GET SINGLE SETTINGS              //
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 /**
  * returns the value of a user setting (must exist)
- * @param {String} user_id 
- * @param {String} group 
- * @param {String} setting 
+ * @param {String} user_id
+ * @param {String} group
+ * @param {String} setting
  */
 async function getUserSetting(user_id, group, setting) {
 
@@ -138,14 +144,16 @@ async function getUserSetting(user_id, group, setting) {
             if (result) {
                 user_setting = result._doc[key];
             }
-        } finally {
+        }
+        finally {
             mongoose.connection.close();
         }
     });
 
     if (user_setting != undefined) {
         return user_setting;
-    } else {
+    }
+    else {
         return user_defaults[group][setting].default;
     }
 
@@ -153,9 +161,9 @@ async function getUserSetting(user_id, group, setting) {
 
 /**
  * returns a single guild settings value, (must exist)
- * @param {String} guild_id 
- * @param {String} group 
- * @param {String} setting 
+ * @param {String} guild_id
+ * @param {String} group
+ * @param {String} setting
  */
 async function getGuildSetting(guild_id, group, setting) {
 
@@ -171,22 +179,24 @@ async function getGuildSetting(guild_id, group, setting) {
             if (result) {
                 guild_setting = result._doc[key];
             }
-        } finally {
+        }
+        finally {
             mongoose.connection.close();
         }
     });
 
     if (guild_setting != undefined) {
         return guild_setting;
-    } else {
+    }
+    else {
         return guild_defaults[group][setting].default;
     }
 
 }
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 //                VERIFY VALUE                 //
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 /**
  * converts and verifies a value. returns undefined,
@@ -200,52 +210,56 @@ function verifyValue(env, group, setting, value) {
     let type;
     let def_setting;
     if (env == 'dm') {
-        def_setting = user_defaults[group][setting]
+        def_setting = user_defaults[group][setting];
         type = typeof def_setting.default;
-    } else {
-        def_setting = guild_defaults[group][setting]
+    }
+    else {
+        def_setting = guild_defaults[group][setting];
         type = typeof def_setting.default;
     }
 
 
     switch (type) {
-        case 'string':
-            return String;
+    case 'string':
+        return String;
 
-        case 'number':
-            const conv_value = Number(value);
-            if (conv_value == NaN) {
-                return undefined;
-            }
-            if (! ( (conv_value >= def_setting.min) && (conv_value <= def_setting.max) ) ) {
-                return undefined;
-            } else {
-                return conv_value;
-            }
-        
-        case 'boolean':
-            if (true_strings.includes(value.toLowerCase())) {
-                return true;
-            } else if (false_strings.includes(value.toLowerCase())) {
-                return false;
-            } else {
-                return undefined;
-            }
-
-        default:
+    case 'number':
+        const conv_value = Number(value);
+        if (isNaN(conv_value)) {
             return undefined;
+        }
+        if (!((conv_value >= def_setting.min) && (conv_value <= def_setting.max))) {
+            return undefined;
+        }
+        else {
+            return conv_value;
+        }
+
+    case 'boolean':
+        if (true_strings.includes(value.toLowerCase())) {
+            return true;
+        }
+        else if (false_strings.includes(value.toLowerCase())) {
+            return false;
+        }
+        else {
+            return undefined;
+        }
+
+    default:
+        return undefined;
     }
 }
 
-/////////////////////////////////////////////////
-//              SET ONE SETTING                //
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
+//              SET ONE SETTING                 //
+// ///////////////////////////////////////////////
 
 /**
  * Sets a setting of a guild to the given value
- * @param {String} guild_id 
- * @param {String} group 
- * @param {String} setting 
+ * @param {String} guild_id
+ * @param {String} group
+ * @param {String} setting
  * @param {any} value value, type dependant on setting
  */
 async function setGuildSetting(guild_id, group, setting, value) {
@@ -256,18 +270,19 @@ async function setGuildSetting(guild_id, group, setting, value) {
         try {
             let data;
             const exists = await guildSettingsSchema.findOne({
-                guild: guild_id
-            })
+                guild: guild_id,
+            });
 
             // doc already exists, prefix might be changed
             if (exists) {
                 data = { [key]: value };
-            } else {    // initial document needs prefix
+            }
+            else { // initial document needs prefix
                 data = {
                     settings: {
-                        prefix: config.discord.prefix,
+                        prefix: config.prefix,
                     },
-                    [key]: value
+                    [key]: value,
                 };
             }
 
@@ -276,7 +291,7 @@ async function setGuildSetting(guild_id, group, setting, value) {
                 guild: guild_id,
             }, data, {
                 upsert: true,
-                new: true
+                new: true,
             });
 
             // write to cache
@@ -284,7 +299,8 @@ async function setGuildSetting(guild_id, group, setting, value) {
                 guild_cache[guild_id] = new_doc._doc;
             }
 
-        } finally {
+        }
+        finally {
             mongoose.connection.close();
         }
     });
@@ -292,7 +308,8 @@ async function setGuildSetting(guild_id, group, setting, value) {
     // check success
     if (guild_cache[guild_id][key] == value) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 
@@ -300,8 +317,8 @@ async function setGuildSetting(guild_id, group, setting, value) {
 
 /**
  * Sets a single setting of a user to a given value
- * @param {String} user_id 
- * @param {String} group 
+ * @param {String} user_id
+ * @param {String} group
  * @param {String} setting
  * @param {any} value value, type dependant on setting
  */
@@ -314,17 +331,18 @@ async function setUserSetting(user_id, group, setting, value) {
             const new_doc = await userSettingsSchema.findOneAndUpdate({
                 user: user_id,
             }, {
-                [key]: value
+                [key]: value,
             }, {
                 upsert: true,
-                new: true
+                new: true,
             });
 
             // write to cache
             if (new_doc) {
                 user_cache[user_id] = new_doc._doc;
             }
-        } finally {
+        }
+        finally {
             mongoose.connection.close();
         }
     });
@@ -332,7 +350,8 @@ async function setUserSetting(user_id, group, setting, value) {
     // check success
     if (user_cache[user_id][key] == value) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 
@@ -346,5 +365,5 @@ module.exports = {
     getGuildSetting,
     verifyValue,
     setGuildSetting,
-    setUserSetting
+    setUserSetting,
 };
