@@ -2,6 +2,7 @@
 const path = require('path');
 
 const { Client, FriendlyError } = require('discord.js-commando');
+const { User } = require('discord.js');
 const { MongoClient } = require('mongodb');
 const { MongoDBProvider } = require('commando-provider-mongo');
 
@@ -9,6 +10,7 @@ const SteamUser = require('steam-user');
 const GlobalOffensive = require('globaloffensive');
 
 const { compileMongoUrl } = require('./mongo');
+const { deleteEntry } = require('./steam/id-lookup');
 
 
 class HaroldClient extends Client {
@@ -84,7 +86,7 @@ class HaroldClient extends Client {
             console.log(error);
         });
 
-        this.steam.on('friendRelationship', (sid, relationship) => {
+        this.steam.on('friendRelationship', async (sid, relationship) => {
             // user requested
             if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
                 console.log('🎮 Got request from ' + sid);
@@ -93,12 +95,18 @@ class HaroldClient extends Client {
             // unfriended
             else if (relationship == SteamUser.EFriendRelationship.None) {
                 console.log('🎮 Got unfriended by ' + sid);
-                /* TODO
-                    - delete entries in database
-                    - notify the user on discord
-                    - delete connected roles (automatic on refresh?)
-                    - IS ALSO EMITTED ON BLOCKS
-                */
+                const { DiscordID = false } = await deleteEntry(false, sid.accountid);
+                if (DiscordID) {
+                    const dc_user = new User(this, { id: DiscordID });
+                    dc_user.createDM();
+                    dc_user.dmChannel.send('Hey, you unfriended / blocked me on discord. ' +
+                        'You are now disconnected. ' +
+                        'It might take a while until the changes take effect.');
+                    console.log('Got unfriended / blocked, and sent an info message to the user');
+                }
+                else {
+                    console.log('Got unfriended / blocked, but there was no connection');
+                }
             }
             // befriended
             else if (relationship == SteamUser.EFriendRelationship.Friend) {
@@ -121,7 +129,7 @@ class HaroldClient extends Client {
             }
         });
 
-        this.steam.on('friendMessage#76561198814489169', (steamID, message) => {
+        this.steam.on('friendMessage#76561198814489169', async (steamID, message) => {
             if (message.startsWith('echo')) {
                 this.steam.chatMessage(
                     steamID,

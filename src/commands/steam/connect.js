@@ -32,7 +32,7 @@ module.exports = class ConnectCommand extends Commando.Command {
      * @param {Function} receivedDM Function that was bound to the event
      */
     async connectToSteam(senderID, msg) {
-        const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, `${senderID}`);
+        const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, senderID);
         if (!SteamID64 || !AccountID) {
             msg.author.dmChannel.send(
                 'Something went wrong ' +
@@ -108,7 +108,6 @@ module.exports = class ConnectCommand extends Commando.Command {
          * @param {String} message content of message
          */
         async function receivedDM(senderID, message) {
-            console.log('Were here');
             // TOKEN RECEIVED
             if (message.includes(token) && !receivedToken) {
 

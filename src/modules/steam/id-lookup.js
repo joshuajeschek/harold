@@ -46,7 +46,7 @@ async function getSteamIDs(DiscordID) {
  * @returns SteamID64 and AccountID, if available
  */
 async function setSteamIDs(DiscordID, steam_id) {
-    const sid = new SteamID(steam_id);
+    const sid = new SteamID(String(steam_id));
     const SteamID64 = sid.getSteamID64();
     const AccountID = sid.accountid;
 
@@ -76,7 +76,7 @@ async function setSteamIDs(DiscordID, steam_id) {
     return { SteamID64, AccountID };
 }
 
-async function deleteEntry(DiscordID = false, steam_id = false) {
+async function deleteEntry(DiscordID = undefined, steam_id = undefined) {
     let old_doc;
     if (DiscordID) {
         await mongo().then(async (mongoose) => {
@@ -91,11 +91,11 @@ async function deleteEntry(DiscordID = false, steam_id = false) {
         });
     }
     else if (steam_id) {
-        const sid = new SteamID(steam_id);
+        const sid = new SteamID(String(steam_id));
         await mongo().then(async (mongoose) => {
             try {
                 old_doc = await steamIDsSchema.findOneAndDelete({
-                    SteamID64: sid.SteamID64,
+                    SteamID64: sid.getSteamID64(),
                 });
             }
             finally {
@@ -106,8 +106,8 @@ async function deleteEntry(DiscordID = false, steam_id = false) {
 
     // successfull access
     if (old_doc) {
-        id_cache.delete(old_doc.DiscordID);
-        return true;
+        id_cache.delete(DiscordID);
+        return { DiscordID: old_doc.DiscordID, SteamID64: old_doc.SteamID64 };
     }
 
     // no parameters or unsuccessfull access
