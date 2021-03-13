@@ -21,6 +21,7 @@ class HaroldClient extends Client {
                 ['util', 'Utility'],
                 ['vote', 'Voting'],
                 ['steam', 'Steam'],
+                ['csgo', 'CS:GO'],
             ])
         // Registers select default commands
             .registerDefaultTypes()
