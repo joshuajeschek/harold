@@ -1,4 +1,4 @@
-const SteamID = require('steamid');
+'use strict';
 const { mongo } = require('../mongo');
 const steamIDsSchema = require('./schemas/steamids-schema');
 
@@ -42,13 +42,12 @@ async function getSteamIDs(DiscordID) {
 /**
  * computes the steam IDs for a user and sets them in the database
  * @param {String} DiscordID discord id of user in question
- * @param {any} steam_id Number/String, for any ol' steam id
+ * @param {SteamID} steam_id Number/String, for any ol' steam id
  * @returns SteamID64 and AccountID, if available
  */
 async function setSteamIDs(DiscordID, steam_id) {
-    const sid = new SteamID(String(steam_id));
-    const SteamID64 = sid.getSteamID64();
-    const AccountID = sid.accountid;
+    const SteamID64 = steam_id.getSteamID64();
+    const AccountID = steam_id.accountid;
 
     id_cache.set(DiscordID, { SteamID64, AccountID });
 
@@ -91,11 +90,10 @@ async function deleteEntry(DiscordID = undefined, steam_id = undefined) {
         });
     }
     else if (steam_id) {
-        const sid = new SteamID(String(steam_id));
         await mongo().then(async (mongoose) => {
             try {
                 old_doc = await steamIDsSchema.findOneAndDelete({
-                    SteamID64: sid.getSteamID64(),
+                    SteamID64: steam_id.getSteamID64(),
                 });
             }
             finally {

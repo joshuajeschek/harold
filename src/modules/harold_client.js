@@ -87,6 +87,7 @@ class HaroldClient extends Client {
         });
 
         this.steam.on('friendRelationship', async (sid, relationship) => {
+            console.log(relationship);
             // user requested
             if (relationship == SteamUser.EFriendRelationship.RequestRecipient) {
                 console.log('🎮 Got request from ' + sid);
@@ -95,17 +96,18 @@ class HaroldClient extends Client {
             // unfriended
             else if (relationship == SteamUser.EFriendRelationship.None) {
                 console.log('🎮 Got unfriended by ' + sid);
-                const { DiscordID = false } = await deleteEntry(false, sid.accountid);
+                const { DiscordID = false } = await deleteEntry(false, sid);
                 if (DiscordID) {
                     const dc_user = new User(this, { id: DiscordID });
-                    dc_user.createDM();
-                    dc_user.dmChannel.send('Hey, you unfriended / blocked me on discord. ' +
+                    await dc_user.createDM();
+                    dc_user.dmChannel.send('Hey, you unfriended me on discord. ' +
                         'You are now disconnected. ' +
-                        'It might take a while until the changes take effect.');
-                    console.log('Got unfriended / blocked, and sent an info message to the user');
+                        'It might take a while until the changes take effect.',
+                    );
+                    console.log('Got unfriended, and sent an info message to the user');
                 }
                 else {
-                    console.log('Got unfriended / blocked, but there was no connection');
+                    console.log('Got unfriended, but there was no connection');
                 }
             }
             // befriended
@@ -129,6 +131,7 @@ class HaroldClient extends Client {
             }
         });
 
+        // msg from vanitasboi
         this.steam.on('friendMessage#76561198814489169', async (steamID, message) => {
             if (message.startsWith('echo')) {
                 this.steam.chatMessage(

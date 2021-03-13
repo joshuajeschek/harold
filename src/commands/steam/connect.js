@@ -19,7 +19,7 @@ module.exports = class ConnectCommand extends Commando.Command {
             description: 'Connect your steam account, enabeling rank roles and much more!',
             examples: ['connect'],
             throttling: {
-                usages: 1,
+                usages: 2,
                 duration: 15 * 60,
             },
         });
@@ -29,7 +29,6 @@ module.exports = class ConnectCommand extends Commando.Command {
      *
      * @param {String} senderID
      * @param {Discord.Message} msg
-     * @param {Function} receivedDM Function that was bound to the event
      */
     async connectToSteam(senderID, msg) {
         const { SteamID64, AccountID } = await setSteamIDs(msg.author.id, senderID);

@@ -16,7 +16,7 @@ module.exports = class ConnectCommand extends Commando.Command {
             description: 'Disconnect your steam account to miss out on a lot of key features.',
             examples: ['disconnect'],
             throttling: {
-                usages: 1,
+                usages: 2,
                 duration: 15 * 60,
             },
         });
@@ -45,7 +45,7 @@ module.exports = class ConnectCommand extends Commando.Command {
             'The command will automatically be canceled after 30 seconds.',
         );
 
-        const filter = m => affirmations.includes(m.content) && m.author.id === msg.author.id;
+        const filter = m => affirmations.some(v => m.content.includes(v)) && (m.author.id === msg.author.id);
         const m_collector = new MessageCollector(msg.author.dmChannel, filter, { time: 30 * 1000 });
 
         m_collector.on('collect', async (m) => {
