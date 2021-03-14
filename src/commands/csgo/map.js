@@ -6,7 +6,7 @@ const levenshtein = require('js-levenshtein');
 const map_embed = require('./resources/map-embed.json');
 const maps = require('./resources/maps.json');
 
-module.exports = class PingCommand extends Commando.Command {
+module.exports = class MapCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'map',

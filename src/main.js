@@ -3,18 +3,17 @@ require('dotenv').config();
 const { exit } = require('process');
 const config = require ('../config.json');
 
-const HaroldClient = require('./modules/harold_client');
+const HaroldClient = require('./modules/client/harold_client');
 
 // instantiate a new harold client (discord + steam)
 const harold = new HaroldClient({
     commandPrefix: config.prefix,
     owner: config.ids.owner,
+}, {
+    accountName: process.env.STEAM_NAME,
+    password: process.env.STEAM_PASSWORD,
+    apikey: process.env.STEAM_API_KEY,
 });
-
-// setup discord and steam (login)
-harold.discordSetup();
-harold.connectToSteam(process.env.STEAM_NAME, process.env.STEAM_PASSWORD);
-harold.connectToCSGO();
 
 // log in (discord)
 if (process.argv.length < 2) {
