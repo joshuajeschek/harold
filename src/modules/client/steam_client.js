@@ -91,7 +91,7 @@ class SteamClient extends SteamUser {
                 deathmatch: rankings.find(element => element.rank_type_id === 10),
             },
             commendations: profile.commendation,
-            vac_banned: profile.vac_banned,
+            // vac_banned: profile.vac_banned, // seems to always be null?
             player_level: profile.player_level,
             player_cur_xp: profile.player_cur_xp,
         };
