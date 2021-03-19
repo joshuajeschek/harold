@@ -88,12 +88,12 @@ class SteamClient extends SteamUser {
             rankings: {
                 competitive: rankings.find(element => element.rank_type_id === 6),
                 wingman: rankings.find(element => element.rank_type_id === 7),
-                deathmatch: rankings.find(element => element.rank_type_id === 10),
+                dangerzone: rankings.find(element => element.rank_type_id === 10),
+                profile: profile.player_level,
             },
             commendations: profile.commendation,
             // vac_banned: profile.vac_banned, // seems to always be null?
-            player_level: profile.player_level,
-            player_cur_xp: profile.player_cur_xp,
+            // player_cur_xp: profile.player_cur_xp,
         };
         return data;
     }
