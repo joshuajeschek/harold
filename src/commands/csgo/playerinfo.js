@@ -23,6 +23,7 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
                 },
             ],
         });
+        this.image_cache = new Map();
     }
 
     async run(msg, { player }) {
@@ -32,9 +33,10 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
         // default to command author
         if (!player || msg.channel.type === 'dm') player = msg.author;
 
-        const { SteamID64, AccountID } = await getSteamIDs(msg.author.id);
+        // get associated steam id
+        const { SteamID64 } = await getSteamIDs(msg.author.id);
 
-        if (!SteamID64 || !AccountID) {
+        if (!SteamID64) {
             msg.channel.send('You are not connected to me on steam. Please use the `connect` command and try again.');
             return;
         }
@@ -44,20 +46,22 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
             return;
         }
 
-        const time0 = new Date();
-        const data = await this.client.steam.getPlayerData(SteamID64);
-        const time1 = new Date();
-        console.log('getPlayerData:', time1 - time0);
+        // get data and compile file, maybe file already exists!
+        let filename;
 
-
-        data.avatar = data.avatar.large;
-        data.mvps = data.stats.total_mvps;
-
-        const time2 = new Date();
-        const filename = await compileInfoGraphic('mirage', data);
-        const time3 = new Date();
-
-        console.log('compileInfoGraphic:', time3 - time2);
+        const cached_image = this.image_cache.get(SteamID64);
+        if(cached_image && (cached_image.timestamp - new Date() < 15 * 60 * 1000)) {
+            console.log('cached file');
+            filename = cached_image.filename;
+        }
+        else {
+            console.log('new file');
+            const data = await this.client.steam.getPlayerData(SteamID64);
+            data.avatar = data.avatar.large;
+            data.mvps = data.stats.total_mvps;
+            filename = await compileInfoGraphic('mirage', data);
+            this.image_cache.set(SteamID64, { filename: filename, timestamp: new Date() });
+        }
 
         const attachment = new MessageAttachment(`./tmp/infographics/${filename}`);
 
@@ -65,6 +69,7 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
         await msg.channel.send(attachment);
         const time5 = new Date();
         console.log('send:', time5 - time4);
+
         msg.channel.stopTyping();
     }
 };

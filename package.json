@@ -28,7 +28,7 @@
     "dev": "nodemon --trace-warnings ./src/main.js T",
     "testing": "node ./src/main.js T",
     "clean": "del *.png",
-    "tmpclean": "del /S /Q .\\tmp\\"
+    "tmpclean": "del /S /Q .\\tmp\\avatars\\*.jpg && del /S /Q .\\tmp\\infographics\\*.png"
   },
   "keywords": [],
   "author": "vanitasboi",
