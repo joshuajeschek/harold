@@ -19,6 +19,7 @@ class HaroldClient extends Client {
         this.discordListeners();
         this.steam = new SteamClient(accountName, password, apikey);
         this.steamListeners();
+        this.last_hltv_request = new Date(1946, 8, 6); // the show must go on
     }
 
     commandoSetup() {
@@ -29,6 +30,7 @@ class HaroldClient extends Client {
                 ['vote', 'Voting'],
                 ['steam', 'Steam'],
                 ['csgo', 'CS:GO'],
+                ['hltv', 'HLTV'],
             ])
         // Registers select default commands
             .registerDefaultTypes()
