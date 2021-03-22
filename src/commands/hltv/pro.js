@@ -1,8 +1,8 @@
-'require strict';
+'use strict';
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
 const { HLTV } = require('hltv');
-const captureWebsite = require('capture-website');
+const getTeamLogo = require('./modules/team_logo');
 
 module.exports = class ProCommand extends Commando.Command {
     constructor(client) {
@@ -22,11 +22,12 @@ module.exports = class ProCommand extends Commando.Command {
                 },
             ],
         });
+        this.getTeamLogo = getTeamLogo.bind(this);
     }
 
     async run(msg, { name }) {
         console.log('>>> pro by', msg.author.tag);
-        
+
         const cooldown = 10 * 1000 - (new Date() - this.client.last_hltv_request); // 10 seconds cooldown timer
         if (cooldown > 0) {
             msg.channel.send(`Please wait ${cooldown / 1000} seconds before using this command again.`);
@@ -100,6 +101,12 @@ module.exports = class ProCommand extends Commando.Command {
 
         embed.addField('Stats:', stats_0, true);
         embed.addField('\u200b', stats_1, true);
+
+        const logo = await this.getTeamLogo(player_data.team.id);
+
+        embed
+            .setThumbnail(logo.url)
+            .setColor(logo.color);
 
         msg.channel.send(embed);
     }
