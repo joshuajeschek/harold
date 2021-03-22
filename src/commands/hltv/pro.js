@@ -2,6 +2,7 @@
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
 const { HLTV } = require('hltv');
+const FuzzySet = require('fuzzyset');
 const getTeamLogo = require('./modules/team_logo');
 
 /**
@@ -61,6 +62,18 @@ module.exports = class ProCommand extends Commando.Command {
             ],
         });
         this.getTeamLogo = getTeamLogo.bind(this);
+        this.refreshPlayerList();
+    }
+
+    async refreshPlayerList() {
+        const names = await HLTV.getPlayerRanking().then(res => {
+            const array = [];
+            for (let i = 0; i < res.length; i++) {
+                array.push(res[i].name);
+            }
+            return array;
+        });
+        this.fuzzy_players = FuzzySet(names);
     }
 
     /**
@@ -154,7 +167,17 @@ module.exports = class ProCommand extends Commando.Command {
 
         const player_data = await getPlayerData(name);
         if (player_data === 'PLAYERNOTFOUND') {
-            msg.channel.send(`Could not find player ${name}.`);
+            let answer = `Could not find player ${name}.`;
+
+            const suggestions = this.fuzzy_players.get(name);
+            if (suggestions.length > 0) {
+                answer += ' Do you mean:\n';
+            }
+            for (let i = 0; i < suggestions.length && i < 5; i++) {
+                answer += `\`${suggestions[i][1]}\`\n`;
+            }
+
+            msg.channel.send(answer);
             msg.channel.stopTyping();
             return;
         }
