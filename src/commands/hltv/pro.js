@@ -97,8 +97,7 @@ module.exports = class ProCommand extends Commando.Command {
             description += `Country: ${player_data.country.name} :flag_${player_data.country.code.toLowerCase()}:\n`;
         }
         if (player_data.team) {
-            description += `Team: [${player_data.team.name}]` +
-            `(https://www.hltv.org/team/${player_data.team.id}/${player_data.team.name.replace(' ', '-')})`;
+            description += `Team: [${player_data.team.name}](https://www.hltv.org/team/${player_data.team.id}/harold)`;
         }
 
         if (description.length != 0) embed.addField(player_data.ign, description, true);
