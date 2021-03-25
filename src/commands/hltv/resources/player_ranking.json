@@ -1,0 +1,14 @@
+{
+    "title": "Player Ranking",
+    "description": "The HLTV ranking of the current top players as of right now.\nTo navigate between pages, use the arrows at the bottom (command initiator only)",
+    "url": "https://www.hltv.org/stats/players",
+    "color": 2846372,
+    "thumbnail": {
+        "url": "https://cdn.discordapp.com/attachments/815232183387029534/823515472800383006/hltv.png"
+    },
+    "author": {
+        "name": "HLTV",
+        "url": "https://www.hltv.org/",
+        "icon_url": "https://cdn.discordapp.com/attachments/815232183387029534/823515472800383006/hltv.png"
+    }
+}
