@@ -34,7 +34,7 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
         if (!player || msg.channel.type === 'dm') player = msg.author;
 
         // get associated steam id
-        const { SteamID64 } = await getSteamIDs(msg.author.id);
+        const { SteamID64 } = await getSteamIDs(player.id);
 
         if (!SteamID64) {
             msg.channel.send('You are not connected to me on steam. Please use the `connect` command and try again.');
@@ -58,7 +58,7 @@ module.exports = class PlayerInfoCommand extends Commando.Command {
             console.log('new file');
             const data = await this.client.steam.getPlayerData(SteamID64);
             data.avatar = data.avatar.large;
-            data.mvps = data.stats.total_mvps;
+            data.mvps = data.stats ? data.stats.total_mvps : 'N/A';
             filename = await compileInfoGraphic('mirage', data);
             this.image_cache.set(SteamID64, { filename: filename, timestamp: new Date() });
         }
