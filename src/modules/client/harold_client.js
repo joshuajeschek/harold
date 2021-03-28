@@ -7,6 +7,7 @@ const { MongoClient } = require('mongodb');
 const { MongoDBProvider } = require('commando-provider-mongo');
 
 const SteamClient = require('./steam_client');
+const HLTVClient = require('./hltv_client');
 
 const { compileMongoUrl } = require('./../mongo');
 const { deleteEntry } = require('./../steam/id-lookup');
@@ -19,6 +20,7 @@ class HaroldClient extends Client {
         this.discordListeners();
         this.steam = new SteamClient(accountName, password, apikey);
         this.steamListeners();
+        this.hltv = new HLTVClient();
         this.last_hltv_request = new Date(1946, 8, 6); // the show must go on
     }
 

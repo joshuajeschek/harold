@@ -1,47 +1,7 @@
 'use strict';
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
-const { HLTV } = require('hltv');
-const FuzzySet = require('fuzzyset');
 const getTeamLogo = require('./modules/team_logo');
-
-/**
- * returns data about a pro player from HLTV.ORG
- * @param {String} name the player to get data about
- * @returns {Object} The data from HLTV
- */
-async function getPlayerData(name) {
-    const player_data = await HLTV.getPlayerByName({ name })
-        .then(res => {
-            return res;
-        })
-        .catch(err => {
-            if (err.message.includes('Player', 'not found')) {
-                return 'PLAYERNOTFOUND';
-            }
-            else {
-                return 'HLTVUNAVAILABLE';
-            }
-        });
-
-    // error?
-    if (typeof player_data === 'string') {return player_data;}
-
-    else {
-        player_data.statistics = await HLTV.getPlayerStats({ id: player_data.id })
-            .then(res => {
-                return res.statistics;
-            })
-            .catch(err => {
-                console.log('Caught HLTV unavailable exception:', err.message);
-                return 'HLTVUNAVAILABLE';
-            });
-    }
-
-    // error?
-    if (typeof player_data.statistics === 'string') {return player_data.statistics;}
-    else {return player_data;}
-}
 
 module.exports = class ProCommand extends Commando.Command {
     constructor(client) {
@@ -62,18 +22,6 @@ module.exports = class ProCommand extends Commando.Command {
             ],
         });
         this.getTeamLogo = getTeamLogo.bind(this);
-        this.refreshPlayerList();
-    }
-
-    async refreshPlayerList() {
-        const names = await HLTV.getPlayerRanking().then(res => {
-            const array = [];
-            for (let i = 0; i < res.length; i++) {
-                array.push(res[i].name);
-            }
-            return array;
-        });
-        this.fuzzy_players = FuzzySet(names);
     }
 
     /**
@@ -155,25 +103,30 @@ module.exports = class ProCommand extends Commando.Command {
     async run(msg, { name }) {
         console.log('>>> pro by', msg.author.tag);
 
-        const cooldown = 10 * 1000 - (new Date() - this.client.last_hltv_request); // 10 seconds cooldown timer
+        const cooldown = 10 * 1000 - (new Date() - this.client.hltv.last_request); // 10 seconds cooldown timer
         if (cooldown > 0) {
             msg.channel.send(`Please wait ${cooldown / 1000} seconds before using this command again.`);
             return;
         }
 
         msg.channel.startTyping();
-        this.client.last_hltv_request = new Date();
+        this.client.hltv.last_request = new Date();
 
-        const player_data = await getPlayerData(name);
-        if (player_data === 'PLAYERNOTFOUND') {
+        const player_data = await this.client.hltv.getPlayerData(name);
+        // PLAYERNOTFOUND -> suggestions
+        if (!player_data) {
+            msg.channel.send(`Could not find player ${name}.`);
+            msg.channel.stopTyping();
+            return;
+        }
+        else if (Array.isArray(player_data)) {
             let answer = `Could not find player ${name}.`;
 
-            const suggestions = this.fuzzy_players.get(name);
-            if (suggestions.length > 0) {
+            if (player_data.length > 0) {
                 answer += ' Do you mean:\n';
             }
-            for (let i = 0; i < suggestions.length && i < 5; i++) {
-                answer += `\`${suggestions[i][1]}\`\n`;
+            for (let i = 0; i < player_data.length && i < 5; i++) {
+                answer += `\`${player_data[i][1]}\`\n`;
             }
 
             msg.channel.send(answer);

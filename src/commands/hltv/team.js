@@ -1,55 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 const Commando = require('discord.js-commando');
-const { HLTV } = require('hltv');
-const FuzzySet = require('fuzzyset');
 const getTeamLineup = require('./modules/team_lineup');
 const getTeamLogo = require('./modules/team_logo');
 
-
-/**
- * returns data about a pro team from HLTV.ORG
- * @param {String} name the team to get data about
- * @returns {Object} The data from HLTV
- */
-async function getTeamData(name) {
-    let team_data = await HLTV.getTeamByName({ name })
-        .then(res => {
-            return res;
-        })
-        .catch(err => {
-            if (err.message.includes('Team', 'not found')) {
-                return 'TEAMNOTFOUND';
-            }
-            else {
-                console.log('Caught HLTV unavailable exception:', err.message);
-                return 'HLTVUNAVAILABLE';
-            }
-        });
-
-    // error?
-    if (typeof team_data === 'string') {return team_data;}
-
-    else {
-        team_data = await HLTV.getTeamStats({ id: team_data.id })
-            .then(res => {
-                return {
-                    ...team_data,
-                    statistics: res.overview,
-                    mapStats: res.mapStats,
-                    standins: res.standins,
-                    historicPlayers: res.historicPlayers,
-                };
-            })
-            .catch(err => {
-                console.log('Caught HLTV unavailable exception:', err.message);
-                return 'HLTVUNAVAILABLE';
-            });
-    }
-
-    // error?
-    if (typeof team_data.statistics === 'string') {return team_data.statistics;}
-    else {return team_data;}
-}
 
 module.exports = class TeamCommand extends Commando.Command {
     constructor(client) {
@@ -71,18 +24,6 @@ module.exports = class TeamCommand extends Commando.Command {
         });
         this.getTeamLineup = getTeamLineup.bind(this);
         this.getTeamLogo = getTeamLogo.bind(this);
-        this.refreshTeamList();
-    }
-
-    async refreshTeamList() {
-        const names = await HLTV.getTeamRanking().then(res => {
-            const array = [];
-            for (let i = 0; i < res.length; i++) {
-                array.push(res[i].team.name);
-            }
-            return array;
-        });
-        this.fuzzy_teams = FuzzySet(names);
     }
 
     /**
@@ -182,26 +123,30 @@ module.exports = class TeamCommand extends Commando.Command {
     async run(msg, { name }) {
         console.log('>>> team by', msg.author.tag);
 
-        const cooldown = 10 * 1000 - (new Date() - this.client.last_hltv_request); // 10 seconds cooldown timer
+        const cooldown = 10 * 1000 - (new Date() - this.client.hltv.last_request); // 10 seconds cooldown timer
         if (cooldown > 0) {
             msg.channel.send(`Please wait ${cooldown / 1000} seconds before using this command again.`);
             return;
         }
 
         msg.channel.startTyping();
-        this.client.last_hltv_request = new Date();
+        this.client.hltv.last_request = new Date();
 
-        const team_data = await getTeamData(name);
+        const team_data = await this.client.hltv.getTeamData(name);
 
-        if (team_data === 'TEAMNOTFOUND') {
+        if (!team_data) {
+            msg.channel.send(`Could not find team ${name}.`);
+            msg.channel.stopTyping();
+            return;
+        }
+        else if (Array.isArray(team_data)) {
             let answer = `Could not find team ${name}.`;
 
-            const suggestions = this.fuzzy_teams.get(name);
-            if (suggestions && suggestions.length > 0) {
+            if (team_data && team_data.length > 0) {
                 answer += ' Do you mean:\n';
             }
-            for (let i = 0; suggestions && i < suggestions.length && i < 5; i++) {
-                answer += `\`${suggestions[i][1]}\`\n`;
+            for (let i = 0; team_data && i < team_data.length && i < 5; i++) {
+                answer += `\`${team_data[i][1]}\`\n`;
             }
 
             msg.channel.send(answer);
