@@ -15,7 +15,7 @@ class HLTVClient {
         const names = await HLTV.getPlayerRanking().then(res => {
             const array = [];
             for (let i = 0; i < res.length; i++) {
-                array.push(res[i].name);
+                array.push(res[i].player.name);
             }
             return array;
         });
@@ -121,6 +121,29 @@ class HLTVClient {
         // error?
         if (typeof team_data.statistics === 'string') {return team_data.statistics;}
         else {return team_data;}
+    }
+
+    /**
+    * returns data about a match from HLTV.ORG
+    * @param {Number} name the match to get data about (id)
+    * @returns {Object} The data from HLTV
+    */
+    async getMatchData(id) {
+        let error = false;
+        const match_data = await HLTV.getMatchStats({ id: id })
+            .then(res => {
+                return res;
+            })
+            .catch(err => {
+                error = true;
+                console.log('Caught HLTV unavailable exception:', err.message);
+                return 'HLTVUNAVAILABLE';
+            });
+
+        // error?
+        if (error) {return match_data;}
+
+        return match_data;
     }
 }
 

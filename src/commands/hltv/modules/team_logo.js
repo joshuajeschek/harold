@@ -1,5 +1,5 @@
 'use strict';
-const captureWebsite = require('capture-website');
+const captureWebsite = import('capture-website'); // FIX ERROR: Must use import to load ES module
 const Vibrant = require('node-vibrant');
 const fs = require('fs');
 const date = require('date-and-time');

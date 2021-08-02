@@ -44,7 +44,10 @@ function compilePlayerRankingEmbeds(ranking) {
             j = embed_array.push(embed) - 1;
         }
         embed_array[j]
-            .addField(`#${i + 1} - ${ranking[i].name}`, `K/D: ${ranking[i].kd}\tRating: ${ranking[i].rating}`)
+            .addField(
+                `#${i + 1} - ${ranking[i].player.name}`,
+                // `K/D: ${ranking[i].kd}` +
+                `\tRating: ${ranking[i].rating1}`)
             .setFooter(`page ${j + 1} of ${pages}`)
             .setTimestamp();
     }

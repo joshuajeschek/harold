@@ -12,6 +12,8 @@ const HLTVClient = require('./hltv_client');
 const { compileMongoUrl } = require('./../mongo');
 const { deleteEntry } = require('./../steam/id-lookup');
 
+const commands = require('../../commands/commands')
+
 
 class HaroldClient extends Client {
     constructor(discord_options, { accountName, password, apikey }) {
@@ -21,7 +23,6 @@ class HaroldClient extends Client {
         this.steam = new SteamClient(accountName, password, apikey);
         this.steamListeners();
         this.hltv = new HLTVClient();
-        this.last_hltv_request = new Date(1946, 8, 6); // the show must go on
     }
 
     commandoSetup() {
@@ -42,7 +43,8 @@ class HaroldClient extends Client {
                 unknownCommand: false,
             })
         // Registers all of the commands in the ./commands/ directory
-            .registerCommandsIn(path.join(__dirname, '../../commands'));
+            .registerCommands(commands);
+            // .registerCommandsIn(path.join(__dirname, '../../commands'));
 
         console.log('💬 Loaded these commands:');
 
