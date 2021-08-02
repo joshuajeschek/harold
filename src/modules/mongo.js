@@ -12,11 +12,11 @@ const compileMongoUrl = function() {
     url = url.replace('<name>', process.env.MONGO_NAME);
     url = url.replace('<password>', process.env.MONGO_PASSWORD);
     switch (app) {
-    case 'T':
+    case 'D':
         url = url.replace('<app>', 'chester');
         return [ url, 'chester' ];
 
-    case 'H':
+    case 'P':
         url = url.replace('<app>', 'harold');
         return [ url, 'harold' ];
 

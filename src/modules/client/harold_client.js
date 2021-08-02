@@ -7,9 +7,12 @@ const { MongoClient } = require('mongodb');
 const { MongoDBProvider } = require('commando-provider-mongo');
 
 const SteamClient = require('./steam_client');
+const HLTVClient = require('./hltv_client');
 
 const { compileMongoUrl } = require('./../mongo');
 const { deleteEntry } = require('./../steam/id-lookup');
+
+const commands = require('../../commands/commands')
 
 
 class HaroldClient extends Client {
@@ -19,6 +22,7 @@ class HaroldClient extends Client {
         this.discordListeners();
         this.steam = new SteamClient(accountName, password, apikey);
         this.steamListeners();
+        this.hltv = new HLTVClient();
     }
 
     commandoSetup() {
@@ -29,6 +33,7 @@ class HaroldClient extends Client {
                 ['vote', 'Voting'],
                 ['steam', 'Steam'],
                 ['csgo', 'CS:GO'],
+                ['hltv', 'HLTV'],
             ])
         // Registers select default commands
             .registerDefaultTypes()
@@ -38,7 +43,8 @@ class HaroldClient extends Client {
                 unknownCommand: false,
             })
         // Registers all of the commands in the ./commands/ directory
-            .registerCommandsIn(path.join(__dirname, '../../commands'));
+            .registerCommands(commands);
+            // .registerCommandsIn(path.join(__dirname, '../../commands'));
 
         console.log('💬 Loaded these commands:');
 

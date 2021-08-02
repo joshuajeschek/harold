@@ -4,7 +4,6 @@ module.exports = class PingCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'ping',
-            aliases: ['p'],
             group: 'util',
             memberName: 'ping',
             description: 'Checks the bots\' status',

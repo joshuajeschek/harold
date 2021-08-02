@@ -20,11 +20,11 @@ if (process.argv.length < 2) {
     console.log('Please specify an application [H/T]');
     exit(1);
 }
-else if (process.argv[2] == 'H') {
+else if (process.argv[2] == 'P') {
     console.log('Logging in as BOT Harold');
     harold.login(process.env.HAROLD_TOKEN);
 }
-else if (process.argv[2] == 'T') {
+else if (process.argv[2] == 'D') {
     console.log('Logging in as Chester McTester');
     harold.login(process.env.TESTBOT_TOKEN);
 }

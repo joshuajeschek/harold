@@ -1,0 +1,6 @@
+{   
+    "ignore": [
+        "src/commands/hltv/modules/logos.json",
+        "src/commands/hltv/modules/lineups.json"
+    ] 
+}
