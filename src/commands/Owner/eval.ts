@@ -109,7 +109,7 @@ export class EvalCommand extends Command {
 					.addBooleanOption((o) => o.setName('silent').setDescription('wether the result should be printed'))
 					.addBooleanOption((o) => o.setName('showhidden').setDescription('showHidden passed to util.inspect'))
 					.addIntegerOption((o) => o.setName('depth').setDescription('depth passed to util.inspect')),
-			{ guildIds: getGuildIds(), idHints: ['958711417513574400'] }
+			{ guildIds: getGuildIds(), idHints: ['958848795611914272'] }
 		);
 	}
 }

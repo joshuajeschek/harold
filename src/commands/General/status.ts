@@ -50,7 +50,7 @@ export class StatusCommand extends Command {
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
 		registry.registerChatInputCommand((b) => b.setName(this.name).setDescription(this.description), {
 			guildIds: getGuildIds(),
-			idHints: ['958711502737670144']
+			idHints: ['958848794617864232']
 		});
 	}
 }

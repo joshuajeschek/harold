@@ -59,7 +59,7 @@ export class SettingsCommand extends Command {
 					.setName(this.name)
 					.setDescription(this.description)
 					.addStringOption((o) => o.setName('prefix').setDescription('the prefix for chat commands')),
-			{ guildIds: getGuildIds(), idHints: ['958711416737628180'] }
+			{ guildIds: getGuildIds(), idHints: ['958851498379468832'] }
 		);
 	}
 }

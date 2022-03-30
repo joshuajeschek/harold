@@ -28,7 +28,7 @@ export class NewsletterCommand extends Command {
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
 		registry.registerChatInputCommand((b) => b.setName(this.name).setDescription(this.description), {
 			guildIds: getGuildIds(),
-			idHints: ['958797300765982750']
+			idHints: ['958848793145651200']
 		});
 	}
 }

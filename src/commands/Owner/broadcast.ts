@@ -73,7 +73,7 @@ export class BroadcastCommand extends Command {
 					.setDescription(this.description)
 					.addStringOption((o) => o.setName('content').setDescription('the content to send').setRequired(true))
 					.addBooleanOption((o) => o.setName('embed').setDescription('wether to wait for an embed').setRequired(true)),
-			{ guildIds: getOwnerGuildIds(), idHints: ['958711502737670144'] }
+			{ guildIds: getOwnerGuildIds(), idHints: ['958847138060705832'] }
 		);
 	}
 }
