@@ -1,0 +1,10 @@
+{
+	"extends": "@sapphire/ts-config",
+	"compilerOptions": {
+		"rootDir": ".",
+		"outDir": ".",
+		"tsBuildInfoFile": "dist/.tsbuildinfo",
+		"composite": true
+	},
+	"files": ["package.json"]
+}

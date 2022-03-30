@@ -1,0 +1,14 @@
+{
+    "title": "Guild Settings",
+    "description": "Here you can see a list of all the available settings, as well as what they are currently set too.",
+    "fields": [
+        {
+            "name": "prefix",
+            "value": "The prefix that commands should use.\n\n- Does not apply to slash commands (invoked by typing '/' in chat).\n\n*default:* `!`",
+            "inline": true
+        }
+    ],
+    "footer": {
+        "text": "select one of the options when using the command to change it"
+    }
+}
