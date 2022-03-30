@@ -100,46 +100,16 @@ export class EvalCommand extends Command {
 
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
 		registry.registerChatInputCommand(
-			{
-				name: this.name,
-				description: this.description,
-				options: [
-					{
-						name: 'code',
-						description: 'the code to evaluate',
-						type: 'STRING',
-						required: true
-					},
-					{
-						name: 'async',
-						description: 'wether the code is asynchronous',
-						type: 'BOOLEAN',
-						required: false
-					},
-					{
-						name: 'silent',
-						description: 'wether the result should be printed',
-						type: 'BOOLEAN',
-						required: false
-					},
-					{
-						name: 'depth',
-						description: 'depth passed to util.inspect',
-						type: 'NUMBER',
-						required: false
-					},
-					{
-						name: 'showhidden',
-						description: 'showHidden passed to util.inspect',
-						type: 'BOOLEAN',
-						required: false
-					}
-				]
-			},
-			{
-				guildIds: getGuildIds(),
-				idHints: ['958711417513574400']
-			}
+			(b) =>
+				b
+					.setName(this.name)
+					.setDescription(this.description)
+					.addStringOption((o) => o.setName('code').setDescription('the code to evaluate').setRequired(true))
+					.addBooleanOption((o) => o.setName('async').setDescription('wether the code is asynchronous'))
+					.addBooleanOption((o) => o.setName('silent').setDescription('wether the result should be printed'))
+					.addBooleanOption((o) => o.setName('showhidden').setDescription('showHidden passed to util.inspect'))
+					.addIntegerOption((o) => o.setName('depth').setDescription('depth passed to util.inspect')),
+			{ guildIds: getGuildIds(), idHints: ['958711417513574400'] }
 		);
 	}
 }

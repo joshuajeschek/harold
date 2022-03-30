@@ -16,26 +16,20 @@ export class BroadcastCommand extends Command {
 		const reply = (await interaction.reply({ content: '...', fetchReply: true })) as Message;
 
 		if (interaction.options.getBoolean('embed', true)) {
-			if (!interaction.channel) {
-				return interaction.editReply('❌ An error occured.');
-			}
+			if (!interaction.channel) return interaction.editReply('❌ An error occured.');
 			const embedPrompter = new MessagePrompter('Please upload a JSON file with embed data.', 'message', {
 				timeout: 5 * 60 * 1000,
 				editMessage: reply
 			});
 			const result = await embedPrompter.run(interaction.channel, interaction.user);
-			if (!('attachments' in result) || result.attachments.size !== 1) {
-				return interaction.followUp('❌ Please provide 1 JSON file!');
-			}
+			if (!('attachments' in result) || result.attachments.size !== 1) return interaction.followUp('❌ Please provide 1 JSON file!');
 			const embed = await this.getEmbedFromAttachment(result.attachments.first());
 			if (!embed) return interaction.followUp('❌ Please provide a valid JSON file!');
 			newsletter.embeds = [embed];
 		}
 
 		let msg = '❌ An error occured.';
-		if (await this.broadcast(newsletter)) {
-			msg = '✅ Newsletter broadcasted';
-		}
+		if (await this.broadcast(newsletter)) msg = '✅ Newsletter broadcasted';
 
 		return newsletter.embeds ? interaction.followUp(msg) : interaction.editReply(msg);
 	}
@@ -62,8 +56,7 @@ export class BroadcastCommand extends Command {
 	}
 
 	private async getEmbedFromAttachment(attachment?: MessageAttachment): Promise<MessageEmbed | null> {
-		if (!attachment) return null;
-		if (!attachment.contentType?.startsWith('application/json')) return null;
+		if (!attachment || !attachment.contentType?.startsWith('application/json')) return null;
 		try {
 			const embed = (await fetch(attachment.url, FetchResultTypes.JSON)) as MessageEmbedOptions;
 			return new MessageEmbed(embed);
@@ -74,28 +67,13 @@ export class BroadcastCommand extends Command {
 
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
 		registry.registerChatInputCommand(
-			{
-				name: this.name,
-				description: this.description,
-				options: [
-					{
-						name: 'content',
-						description: 'the content to send',
-						type: 'STRING',
-						required: true
-					},
-					{
-						name: 'embed',
-						description: 'wether to wait for an embed',
-						type: 'BOOLEAN',
-						required: true
-					}
-				]
-			},
-			{
-				guildIds: getOwnerGuildIds(),
-				idHints: ['958711503480041472']
-			}
+			(b) =>
+				b
+					.setName(this.name)
+					.setDescription(this.description)
+					.addStringOption((o) => o.setName('content').setDescription('the content to send').setRequired(true))
+					.addBooleanOption((o) => o.setName('embed').setDescription('wether to wait for an embed').setRequired(true)),
+			{ guildIds: getOwnerGuildIds(), idHints: ['958711502737670144'] }
 		);
 	}
 }

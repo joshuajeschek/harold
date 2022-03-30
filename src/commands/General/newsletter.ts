@@ -4,12 +4,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton } from 'di
 import { getGuildIds } from '../../lib/env-parser';
 
 @ApplyOptions<CommandOptions>({
-	description: 'Subscribe / Unsubscribe from the newsletter',
-	chatInputCommand: {
-		register: true,
-		guildIds: getGuildIds(),
-		idHints: ['958711418235002910']
-	}
+	description: 'Subscribe / Unsubscribe from the newsletter'
 })
 export class NewsletterCommand extends Command {
 	public async messageRun(message: Message) {
@@ -31,9 +26,9 @@ export class NewsletterCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
-		registry.registerChatInputCommand({
-			name: this.name,
-			description: this.description
+		registry.registerChatInputCommand((b) => b.setName(this.name).setDescription(this.description), {
+			guildIds: getGuildIds(),
+			idHints: ['958797300765982750']
 		});
 	}
 }

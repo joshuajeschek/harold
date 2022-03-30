@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Command, CommandOptions } from '@sapphire/framework';
+import { ApplicationCommandRegistry, Command, CommandOptions } from '@sapphire/framework';
 import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageOptions } from 'discord.js';
 import { getGuildIds } from '../../lib/env-parser';
 import si from 'systeminformation';
@@ -7,12 +7,7 @@ import { version, homepage, bugs } from '../../../package.json';
 import { getAccentColor, millisecondsToTime } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
-	description: "Get information about the bot's status",
-	chatInputCommand: {
-		register: true,
-		guildIds: getGuildIds(),
-		idHints: ['958711502737670144']
-	}
+	description: "Get information about the bot's status"
 })
 export class StatusCommand extends Command {
 	private osInfo?: string;
@@ -50,5 +45,12 @@ export class StatusCommand extends Command {
 		return `Platform: ${info.platform}
             Distribution: ${info.distro}
             Release: ${info.release}`;
+	}
+
+	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
+		registry.registerChatInputCommand((b) => b.setName(this.name).setDescription(this.description), {
+			guildIds: getGuildIds(),
+			idHints: ['958711502737670144']
+		});
 	}
 }

@@ -15,6 +15,7 @@ export class SettingsCommand extends Command {
 	public async chatInputRun(interaction: CommandInteraction) {
 		if (!interaction.guildId) return interaction.reply({ content: 'Please use this only in a guild.', ephemeral: true });
 
+		// new settings should be added here (and at the bottom in the options)
 		const settings = pickBy({
 			id: interaction.guildId,
 			prefix: interaction.options.getString('prefix', false) ?? undefined
@@ -32,7 +33,7 @@ export class SettingsCommand extends Command {
 				const embed = await this.compileSettingsEmbed(guild);
 				const updated = Object.keys(settings).filter((v) => v !== 'id');
 				if (updated.length > 0) embed.setFooter({ text: `updated: ${updated}`.replaceAll(',', ', ') });
-				return interaction.reply({ content, embeds: [embed], ephemeral: true });
+				await interaction.reply({ content, embeds: [embed], ephemeral: true });
 			});
 	}
 
@@ -53,22 +54,12 @@ export class SettingsCommand extends Command {
 
 	public override registerApplicationCommands(registry: ApplicationCommandRegistry) {
 		registry.registerChatInputCommand(
-			{
-				name: this.name,
-				description: this.description,
-				options: [
-					{
-						name: 'prefix',
-						description: 'the prefix for commands',
-						type: 'STRING',
-						required: false
-					}
-				]
-			},
-			{
-				guildIds: getGuildIds(),
-				idHints: ['958711416737628180']
-			}
+			(b) =>
+				b
+					.setName(this.name)
+					.setDescription(this.description)
+					.addStringOption((o) => o.setName('prefix').setDescription('the prefix for chat commands')),
+			{ guildIds: getGuildIds(), idHints: ['958711416737628180'] }
 		);
 	}
 }
