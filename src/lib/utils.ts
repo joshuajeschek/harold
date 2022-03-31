@@ -23,6 +23,23 @@ export function sendLoadingMessage(message: Message): Promise<typeof message> {
 	return send(message, { embeds: [new MessageEmbed().setDescription(pickRandom(RandomLoadingMessage)).setColor('#FF0000')] });
 }
 
+/**
+ * returns a string representations of a query parameter
+ * @param raw the raw query, as returned by request.query
+ */
+export function getQuery(raw: string | string[] | undefined): string | undefined;
+export function getQuery(raw: string | string[] | undefined, def: string): string;
+export function getQuery(raw: string | string[] | undefined, def?: string): string | undefined {
+	if (!raw) return def;
+	if (typeof raw === 'string') return raw;
+	return raw.join();
+}
+
+export function createFilename(prefix: string, type: string) {
+	const now = new Date();
+	return `${prefix}-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}${now.getMilliseconds()}.${type}`;
+}
+
 export function interactionReplyOrFollowUp(
 	interaction: CommandInteraction | MessageComponentInteraction,
 	options: string | MessagePayload | InteractionReplyOptions
