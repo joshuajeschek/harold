@@ -18,7 +18,9 @@ export class SettingsCommand extends Command {
 		// new settings should be added here (and at the bottom in the options)
 		const settings = pickBy({
 			id: interaction.guildId,
-			prefix: interaction.options.getString('prefix', false) ?? undefined
+			prefix: interaction.options.getString('prefix', false) ?? undefined,
+			voteTime: interaction.options.getNumber('vote-time') ?? undefined,
+			voteCount: interaction.options.getInteger('vote-count') ?? undefined
 		}) as Guild;
 
 		this.container.db.guild
@@ -58,7 +60,13 @@ export class SettingsCommand extends Command {
 				b
 					.setName(this.name)
 					.setDescription(this.description)
-					.addStringOption((o) => o.setName('prefix').setDescription('the prefix for chat commands')),
+					.addStringOption((o) => o.setName('prefix').setDescription('the prefix for chat commands'))
+					.addNumberOption((o) =>
+						o.setName('vote-time').setDescription('the maximum vote time (in minutes)').setMinValue(0.1).setMaxValue(10)
+					)
+					.addIntegerOption((o) =>
+						o.setName('vote-count').setDescription('how many votes to pass / fail a vote').setMinValue(1).setMaxValue(99)
+					),
 			{ guildIds: getGuildIds(), idHints: ['958851498379468832'] }
 		);
 	}

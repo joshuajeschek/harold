@@ -6,6 +6,16 @@
             "name": "prefix",
             "value": "The prefix that commands should use.\n\n- Does not apply to slash commands (invoked by typing '/' in chat).\n\n*default:* `!`",
             "inline": true
+        },
+        {
+            "name": "voteTime",
+            "value": "The maximum time a vote can take, in minutes.\n\n- min: `0.1`\n\n- max: `10`\n\n*default:* `5`",
+            "inline": true
+        },
+        {
+            "name": "voteCount",
+            "value": "How many votes it takes for a vote to pass / fail.\n\n- min: `1`\n\n- max: `99`\n\n*default:* `4`",
+            "inline": true
         }
     ],
     "footer": {
