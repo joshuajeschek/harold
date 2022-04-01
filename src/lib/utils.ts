@@ -1,3 +1,4 @@
+import { fetch } from '@sapphire/fetch';
 import { container } from '@sapphire/framework';
 import type { CommandInteraction, InteractionReplyOptions, MessageComponentInteraction, MessagePayload } from 'discord.js';
 import Vibrant from 'node-vibrant';
@@ -11,6 +12,12 @@ import Vibrant from 'node-vibrant';
 export function pickRandom<T>(array: readonly T[]): T {
 	const { length } = array;
 	return array[Math.floor(Math.random() * length)];
+}
+
+export function haroldApi(route: string): Promise<RouteResponse> {
+	const url = (process.env['BASE_URL'] ?? 'http://localhost') + route;
+	container.logger.info('fetching ', url);
+	return fetch(url);
 }
 
 /**
