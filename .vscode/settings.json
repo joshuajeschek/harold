@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "commands",
         "routes",
-        "db"
+        "db",
+        "resources"
     ]
 }
