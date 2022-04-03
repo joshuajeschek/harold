@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { isGuildBasedChannel } from '@sapphire/discord.js-utilities';
 import { container, LogLevel, SapphireClient } from '@sapphire/framework';
+import { Time } from '@sapphire/time-utilities';
 import type { Message } from 'discord.js';
 
 export class HaroldClient extends SapphireClient {
@@ -33,7 +34,12 @@ export class HaroldClient extends SapphireClient {
 					}
 				]
 			},
-			loadMessageCommandListeners: true
+			loadMessageCommandListeners: true,
+			hmr: {
+				enabled: process.env.NODE_ENV === 'development',
+				usePolling: true,
+				interval: Time.Second * 2
+			}
 		});
 	}
 
