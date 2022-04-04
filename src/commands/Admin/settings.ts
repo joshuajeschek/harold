@@ -4,7 +4,7 @@ import { ApplicationCommandRegistry, Command, CommandOptions } from '@sapphire/f
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { pickBy } from 'lodash';
 import { getGuildIds } from '../../lib/env-parser';
-import { getBotAccentColor } from '../../lib/utils';
+import { getBotAccentColor, safelyError } from '../../lib/utils';
 import settingsEmbed from './assets/settingsEmbed.json';
 
 @ApplyOptions<CommandOptions>({
@@ -29,7 +29,7 @@ export class SettingsCommand extends Command {
 				create: settings,
 				update: settings
 			})
-			.catch((e) => this.container.logger.error(e))
+			.catch((e) => safelyError(e, 'fetch settings'))
 			.then(async (guild) => {
 				const content = guild ? 'Your settings:' : "Couldn't fetch your current settings :(";
 				const embed = await this.compileSettingsEmbed(guild);

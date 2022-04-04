@@ -4,7 +4,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEm
 import { getGuildIds } from '../../lib/env-parser';
 import si from 'systeminformation';
 import { version, homepage, bugs } from '../../../package.json';
-import { getAccentColor, millisecondsToTime } from '../../lib/utils';
+import { getBotAccentColor, millisecondsToTime } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	description: "Get information about the bot's status"
@@ -25,7 +25,7 @@ export class StatusCommand extends Command {
 		const ping = `${this.container.client.ws.ping ? `${Math.round(this.container.client.ws.ping)} ms` : 'N/A'}`;
 		const embed = new MessageEmbed()
 			.setTitle('Status')
-			.setColor(await getAccentColor())
+			.setColor(await getBotAccentColor())
 			.addField('ping: ', ping)
 			.addField('uptime: ', millisecondsToTime(this.container.client.uptime))
 			.addField('running on:', this.osInfo)

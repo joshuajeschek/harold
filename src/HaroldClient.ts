@@ -3,6 +3,8 @@ import { isGuildBasedChannel } from '@sapphire/discord.js-utilities';
 import { container, LogLevel, SapphireClient } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import type { Message } from 'discord.js';
+import type HltvPlus from './lib/hltv/HLTVplus';
+import HLTVplus from './lib/hltv/HLTVplus';
 
 export class HaroldClient extends SapphireClient {
 	public constructor() {
@@ -47,6 +49,7 @@ export class HaroldClient extends SapphireClient {
 		const db = new PrismaClient();
 		this.logger.info('connected to database');
 		container.db = db;
+		container.hltv = new HLTVplus({ fetchChoices: process.env.NODE_ENV !== 'development' });
 		return super.login(token);
 	}
 
@@ -75,5 +78,6 @@ export class HaroldClient extends SapphireClient {
 declare module '@sapphire/pieces' {
 	interface Container {
 		db: PrismaClient;
+		hltv: HltvPlus;
 	}
 }

@@ -4,6 +4,9 @@ import { isThenable } from '@sapphire/utilities';
 import { MessageAttachment, TextBasedChannel } from 'discord.js';
 import Vibrant from 'node-vibrant';
 
+export const safelyError = (e: any, ctx: string) =>
+	container.logger.error(`${e.name} [${ctx}]: ${e.message}${e.cause ? `\n${e.cause}` : ''}${e.stack ? `\n${e.stack}` : ''}`);
+
 export function haroldApi(route: string): Promise<RouteResponse> {
 	const url = (process.env['BASE_URL'] ?? 'http://localhost') + route;
 	container.logger.info('fetching ', url);
@@ -71,7 +74,7 @@ export async function getAccentColor(url?: Promise<string | undefined> | string)
 	if (!url) return;
 	const palette = await Vibrant.from(url)
 		.getPalette()
-		.catch((e) => container.logger.error(e.message, url));
+		.catch((e) => safelyError(e, `get accent color from ${url}`));
 	if (!palette) return undefined;
 	return palette.Vibrant?.hex ? parseInt(palette.Vibrant?.hex.replaceAll(/[^0-9a-fA-f]/g, ''), 16) : undefined;
 }
