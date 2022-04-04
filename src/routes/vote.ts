@@ -3,9 +3,7 @@ import { methods, Route, ApiRequest, ApiResponse, RouteOptions } from '@sapphire
 import Jimp from 'jimp';
 import type { Font } from '@jimp/plugin-print/index';
 import path from 'node:path';
-import { createFilename, getQuery } from '../lib/utils';
-import type { TextBasedChannel } from 'discord.js';
-import { unlink } from 'node:fs/promises';
+import { getImageUrl, getQuery } from '../lib/utils';
 
 @ApplyOptions<RouteOptions>({
 	route: '/vote/:subcommand'
@@ -15,8 +13,6 @@ export class VoteRoute extends Route {
 	private contentFont?: Font;
 	private yesFont?: Font;
 	private noFont?: Font;
-
-	private imageChannel?: TextBasedChannel;
 
 	public [methods.GET](request: ApiRequest, response: ApiResponse) {
 		this.main(request, response);
@@ -50,9 +46,6 @@ export class VoteRoute extends Route {
 		this.contentFont ||= await Jimp.loadFont(path.join('resources', 'fonts', 'boxedround-y.fnt'));
 		this.yesFont ||= await Jimp.loadFont(path.join('resources', 'fonts', 'boxedround-mg.fnt'));
 		this.noFont ||= await Jimp.loadFont(path.join('resources', 'fonts', 'boxedround-mr.fnt'));
-		this.imageChannel ||= (await this.container.client.channels.fetch('813551053844643860')) as TextBasedChannel;
-
-		const filename = createFilename(template, 'png');
 
 		const image = (await this.loadTemplate(template))
 			.print(this.contentFont, 30, 105, ctx, 350)
@@ -61,11 +54,11 @@ export class VoteRoute extends Route {
 
 		if (author) image.print(this.headerFont, 76, 27, `Vote by: ${author}`);
 
-		await image.writeAsync(filename).catch((e) => this.container.logger.error('Error while saving a vote image:', e));
+		const buffer = await image.getBufferAsync(Jimp.MIME_PNG).catch((e) => this.container.logger.error('Error while buffering a vote image:', e));
 
-		const url = (await this.imageChannel.send({ files: [{ attachment: filename, name: filename }] })).attachments.first()?.url;
+		if (!buffer) return;
 
-		unlink(filename).catch((e) => this.container.logger.error('Error while deleting a vote image:', e));
+		const url = getImageUrl(buffer);
 
 		return url;
 	}

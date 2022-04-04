@@ -6,7 +6,7 @@ import { getGuildIds } from '../../lib/env-parser';
 import { haroldApi } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
-	description: "Get information about the bot's status"
+	description: 'Hold CS:GO-style votes.'
 })
 export class VoteCommand extends Command {
 	readonly #maps = ['Inferno', 'Mirage', 'Nuke', 'Overpass', 'Dust II', 'Vertigo', 'Ancient', 'Train', 'Cache', 'Grind', 'Mocha'].map((m) => ({
@@ -129,7 +129,7 @@ export class VoteCommand extends Command {
 					.addSubcommand((b) =>
 						b
 							.setName('kick')
-							.setDescription('Do a CS:GO style kick vote, no players harmed,')
+							.setDescription('Do a CS:GO style kick vote, no players harmed.')
 							.addUserOption((o) => o.setName('player').setDescription('Who should be kicked?').setRequired(true))
 					)
 					.addSubcommand((b) =>
@@ -143,8 +143,8 @@ export class VoteCommand extends Command {
 					.addSubcommand((b) =>
 						b.setName('surrender').setDescription("Do you really wanna surrender? There's always a chance to come back!")
 					)
-					.addSubcommand((b) => b.setName('timeout').setDescription('Call a tactical timeout,')),
-			{ guildIds: getGuildIds(), idHints: ['959102108026691614'] }
+					.addSubcommand((b) => b.setName('timeout').setDescription('Call a tactical timeout.')),
+			{ guildIds: getGuildIds(), idHints: [] }
 		);
 	}
 }

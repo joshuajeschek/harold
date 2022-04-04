@@ -13,7 +13,7 @@ import {
 	MessageEmbed
 } from 'discord.js';
 import { getOwnerGuildIds } from '../../lib/env-parser';
-import { getAccentColor } from '../../lib/utils';
+import { getBotAccentColor } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	description: 'Inspect and Cherry Pick installed commands',
@@ -66,7 +66,7 @@ export class ApplicationCommandsCommand extends Command {
 		const pm = new PaginatedMessage({ template: { content: 'Following application commands have been detected:' } });
 		pm.actions.delete('@sapphire/paginated-messages.firstPage');
 		pm.actions.delete('@sapphire/paginated-messages.goToLastPage');
-		const accentColor = await getAccentColor();
+		const accentColor = await getBotAccentColor();
 		pm.addPages(commands.map((command) => ({ embeds: [this.commandToEmbed(command, accentColor)] })));
 		pm.setSelectMenuOptions((pageIndex) => {
 			return {

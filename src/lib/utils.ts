@@ -1,18 +1,8 @@
 import { fetch } from '@sapphire/fetch';
 import { container } from '@sapphire/framework';
-import type { CommandInteraction, InteractionReplyOptions, MessageComponentInteraction, MessagePayload } from 'discord.js';
+import { isThenable } from '@sapphire/utilities';
+import { MessageAttachment, TextBasedChannel } from 'discord.js';
 import Vibrant from 'node-vibrant';
-
-/**
- * Picks a random item from an array
- * @param array The array to pick a random item from
- * @example
- * const randomEntry = pickRandom([1, 2, 3, 4]) // 1
- */
-export function pickRandom<T>(array: readonly T[]): T {
-	const { length } = array;
-	return array[Math.floor(Math.random() * length)];
-}
 
 export function haroldApi(route: string): Promise<RouteResponse> {
 	const url = (process.env['BASE_URL'] ?? 'http://localhost') + route;
@@ -32,17 +22,11 @@ export function getQuery(raw: string | string[] | undefined, def?: string): stri
 	return raw.join();
 }
 
-export function createFilename(prefix: string, type: string) {
-	const now = new Date();
-	return `${prefix}-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}${now.getMilliseconds()}.${type}`;
-}
-
-export function interactionReplyOrFollowUp(
-	interaction: CommandInteraction | MessageComponentInteraction,
-	options: string | MessagePayload | InteractionReplyOptions
-) {
-	if (interaction.replied) return interaction.followUp(options);
-	return interaction.reply(options);
+let imageChannel: TextBasedChannel;
+export async function getImageUrl(buffer: Buffer): Promise<string | null> {
+	imageChannel ||= (await container.client.channels.fetch('813551053844643860')) as TextBasedChannel;
+	const message = await imageChannel.send({ files: [new MessageAttachment(buffer)] });
+	return message.attachments.at(0)?.url ?? null;
 }
 
 /**
@@ -71,14 +55,28 @@ export function millisecondsToTime(milliseconds: number | null): string {
 	);
 }
 
-let accentColor: number;
-export async function getAccentColor(): Promise<number> {
-	if (accentColor) return accentColor;
+let botAccentColor: number;
+export async function getBotAccentColor(): Promise<number> {
+	if (botAccentColor) return botAccentColor;
 	// not necessary, since bot users currently always have accentColor=null
 	// if (!this.container.client.user?.accentColor) await this.container.client.user?.fetch(true);
 	// if (this.container.client.user?.accentColor) return this.container.client.user.accentColor;
 	if (!container.client.user) return 3092790;
-	const palette = await Vibrant.from(container.client.user.displayAvatarURL({ format: 'png' })).getPalette();
-	accentColor = palette.Vibrant?.hex ? parseInt(palette.Vibrant?.hex.replaceAll(/[^0-9a-fA-f]/g, ''), 16) : 3092790;
-	return accentColor;
+	botAccentColor = (await getAccentColor(container.client.user.displayAvatarURL({ format: 'png' }))) ?? 3092790;
+	return botAccentColor;
+}
+
+export async function getAccentColor(url?: Promise<string | undefined> | string): Promise<number | undefined> {
+	url = isThenable(url) ? await url : url;
+	if (!url) return;
+	const palette = await Vibrant.from(url)
+		.getPalette()
+		.catch((e) => container.logger.error(e.message, url));
+	if (!palette) return undefined;
+	return palette.Vibrant?.hex ? parseInt(palette.Vibrant?.hex.replaceAll(/[^0-9a-fA-f]/g, ''), 16) : undefined;
+}
+
+export function truncateArray(array: string[], maxSize: number, offset?: number): string[] {
+	while (array.reduce<number>((prev, curr) => prev + curr.length + (offset ?? 0), 0) > maxSize) array.pop();
+	return array;
 }

@@ -4,7 +4,7 @@ import { ApplicationCommandRegistry, Command, CommandOptions } from '@sapphire/f
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { pickBy } from 'lodash';
 import { getGuildIds } from '../../lib/env-parser';
-import { getAccentColor } from '../../lib/utils';
+import { getBotAccentColor } from '../../lib/utils';
 import settingsEmbed from './assets/settingsEmbed.json';
 
 @ApplyOptions<CommandOptions>({
@@ -40,7 +40,7 @@ export class SettingsCommand extends Command {
 	}
 
 	private async compileSettingsEmbed(guild: void | Guild): Promise<MessageEmbed> {
-		const embed = new MessageEmbed(settingsEmbed).setColor(await getAccentColor());
+		const embed = new MessageEmbed(settingsEmbed).setColor(await getBotAccentColor());
 		if (this.container.client.user) embed.setThumbnail(this.container.client.user.displayAvatarURL());
 		if (!guild) return embed;
 

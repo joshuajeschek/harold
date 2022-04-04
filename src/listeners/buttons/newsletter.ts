@@ -2,7 +2,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener, ListenerOptions } from '@sapphire/framework';
 import { isNullishOrEmpty } from '@sapphire/utilities';
 import type { Interaction } from 'discord.js';
-import { interactionReplyOrFollowUp } from '../../lib/utils';
 
 const lastInteractionMap = new Map<string, Date>();
 export const buttonCooldown = 60 * 1000;
@@ -18,13 +17,12 @@ export class UserEvent extends Listener<typeof Events.InteractionCreate> {
 		if (interaction.customId === 'newsletterSubscribe') wantsNewsletter = true;
 		if (wantsNewsletter === null) return;
 
+		await interaction.deferReply({ ephemeral: true });
+
 		const lastInteraction = lastInteractionMap.get(interaction.user.id);
 		const cooldown = lastInteraction ? lastInteraction.getTime() + buttonCooldown - new Date().getTime() : -1;
 		if (cooldown > 0) {
-			return interactionReplyOrFollowUp(interaction, {
-				content: `Slow down there bud! Try again in ${cooldown / 1000} seconds!`,
-				ephemeral: true
-			});
+			return interaction.editReply(`Slow down there bud! Try again in ${cooldown / 1000} seconds!`);
 		} else {
 			lastInteractionMap.set(interaction.user.id, new Date());
 		}
@@ -42,15 +40,10 @@ export class UserEvent extends Listener<typeof Events.InteractionCreate> {
 			}
 		});
 
-		if (isNullishOrEmpty(res))
-			return interactionReplyOrFollowUp(interaction, {
-				content: 'An error occured! Please try again later!',
-				ephemeral: true
-			});
+		if (isNullishOrEmpty(res)) return interaction.editReply('An error occured! Please try again later!');
 
-		return interactionReplyOrFollowUp(interaction, {
-			content: wantsNewsletter ? '🔔 You are now subscribed to the newsletter!' : '🔕 You are now unsubscribed from the newsletter.',
-			ephemeral: true
-		});
+		return interaction.editReply(
+			wantsNewsletter ? '🔔 You are now subscribed to the newsletter!' : '🔕 You are now unsubscribed from the newsletter.'
+		);
 	}
 }
