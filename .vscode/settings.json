@@ -3,6 +3,7 @@
         "commands",
         "routes",
         "db",
-        "resources"
+        "resources",
+        "tasks"
     ]
 }

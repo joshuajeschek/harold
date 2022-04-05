@@ -1,15 +1,14 @@
 import { container } from '@sapphire/framework';
+import { Stopwatch } from '@sapphire/stopwatch';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { flagSuffixes, customEmojis as ce } from '../constants.js';
 import { truncateArray } from '../utils.js';
 import HLTVPlus from './HLTVplus.js';
 
 export default async (interaction: CommandInteraction | ButtonInteraction, args: { id: number }) => {
-	const contentStart = performance.now();
+	const stopwatch = new Stopwatch();
 	const player = await container.hltv.getCachedPlayer(args);
 	if (!player) return interaction.reply({ content: 'An error occured while retrieving player data. Sorry!', ephemeral: true });
-
-	console.log(player);
 
 	const description = [];
 	if (player.name) description.push(`**Full name:** ${player.name}`);
@@ -82,15 +81,13 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 		  ]
 		: undefined;
 
-	const contentEnd = performance.now();
-
-	embed.setFooter({ text: `${Math.round(contentEnd - contentStart)} ms (content)` });
+	embed.setFooter({ text: `${stopwatch} (content)` });
 
 	interaction.editReply({ embeds: [embed], components });
 
 	/* --- */
 
-	const mediaStart = performance.now();
+	stopwatch.restart();
 
 	const team = player.team?.id ? await container.hltv.getCachedTeam({ id: player.team.id }) : undefined;
 
@@ -101,8 +98,7 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 	if (logo) embed.setThumbnail(logo);
 	if (accentColor) embed.setColor(accentColor);
 
-	const mediaEnd = performance.now();
-	embed.setFooter({ text: `${embed.footer?.text}, ${Math.round(mediaEnd - mediaStart)} ms (media)` });
+	embed.setFooter({ text: `${embed.footer?.text}, ${stopwatch} (media)` });
 
 	interaction.editReply({ embeds: [embed] });
 };

@@ -5,6 +5,7 @@ import { Time } from '@sapphire/time-utilities';
 import type { Message } from 'discord.js';
 import type HltvPlus from './lib/hltv/HLTVplus';
 import HLTVplus from './lib/hltv/HLTVplus';
+import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
 
 export class HaroldClient extends SapphireClient {
 	public constructor() {
@@ -41,6 +42,15 @@ export class HaroldClient extends SapphireClient {
 				enabled: process.env.NODE_ENV === 'development',
 				usePolling: true,
 				interval: Time.Second * 2
+			},
+			tasks: {
+				strategy: new ScheduledTaskRedisStrategy({
+					bull: {
+						redis: {
+							db: 1
+						}
+					}
+				})
 			}
 		});
 	}

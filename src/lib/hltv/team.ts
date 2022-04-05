@@ -1,4 +1,5 @@
 import { container } from '@sapphire/framework';
+import { Stopwatch } from '@sapphire/stopwatch';
 import { isThenable } from '@sapphire/utilities';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { TeamPlayerType } from 'hltv';
@@ -7,7 +8,7 @@ import { truncateArray } from '../utils.js';
 import HLTVPlus from './HLTVplus.js';
 
 export default async (interaction: CommandInteraction | ButtonInteraction, args: { id: number }) => {
-	const contentStart = performance.now();
+	const stopwatch = new Stopwatch();
 	const team = await container.hltv.getCachedTeam(args);
 	if (!team) return interaction.reply({ content: 'An error occured while retrieving player data. Sorry!', ephemeral: true });
 
@@ -66,14 +67,13 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 	if (starterButtons.length > 0) components.push(new MessageActionRow().addComponents(starterButtons));
 	if (otherButtons.length > 0) components.push(new MessageActionRow().addComponents(otherButtons));
 
-	const contentEnd = performance.now();
-	embed.setFooter({ text: `${Math.round(contentEnd - contentStart)} ms (content)` });
+	embed.setFooter({ text: `${stopwatch} (content)` });
 
 	interaction.editReply({ embeds: [embed], components });
 
 	/* --- */
 
-	const mediaStart = performance.now();
+	stopwatch.restart();
 
 	const lineup = await container.hltv.getCachedLineup(args);
 	const accentColor = await team.accentColor;
@@ -85,8 +85,7 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 	if (logo) embed.setThumbnail(logo);
 	if (accentColor) embed.setColor(accentColor);
 
-	const mediaEnd = performance.now();
-	embed.setFooter({ text: `${embed.footer?.text}, ${Math.round(mediaEnd - mediaStart)} ms (media)` });
+	embed.setFooter({ text: `${embed.footer?.text}, ${stopwatch} (media)` });
 
 	interaction.editReply({ embeds: [embed] });
 };

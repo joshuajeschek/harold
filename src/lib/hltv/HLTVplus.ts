@@ -1,7 +1,7 @@
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import { ApplicationCommandOptionChoice, Collection } from 'discord.js';
-import { FullPlayer, FullTeam, Hltv, TeamPlayerType } from 'hltv';
+import { FullPlayer, FullTeam, Hltv, PlayerRanking, TeamPlayerType, TeamRanking } from 'hltv';
 import NodeCache from 'node-cache';
 import player from './player';
 import rankingplayers from './rankingplayers';
@@ -28,6 +28,8 @@ type HltvAction = 'player' | 'team' | 'rankingplayers' | 'rankingteams';
 export default class HLTVPlus extends Hltv {
 	#players?: HLTVOptionChoice[];
 	#teams?: HLTVOptionChoice[];
+	teamRanking?: TeamRanking[];
+	playerRanking?: PlayerRanking[];
 
 	// objects are cached for one day, expired elements are check every 10 minutes
 	#ttl = Time.Day / 1000;
@@ -50,15 +52,17 @@ export default class HLTVPlus extends Hltv {
 		`https://www.hltv.org/${domain}/${id}/${name.toLowerCase().replaceAll(/ |\?/g, '-')}`;
 	public static getUrlString = (domain: string, name: string, id?: number) => (id ? `[${name}](${this.getUrl(domain, name, id)})` : name);
 
-	public getChoices = (type: 'player' | 'team') => (type === 'player' ? this.#players : this.#teams) || this.updateChoices(type);
+	public getChoices = async (type: 'player' | 'team') =>
+		(type === 'player' ? this.#players : this.#teams) || (await this.updateChoices(type)) || [];
+
 	public async updateChoices(): Promise<void>;
-	public async updateChoices(type: 'player' | 'team'): Promise<HLTVOptionChoice[]>;
+	public async updateChoices(type: 'player' | 'team'): Promise<HLTVOptionChoice[] | undefined>;
 	public async updateChoices(type?: 'player' | 'team'): Promise<void | HLTVOptionChoice[]> {
 		container.logger.info('[HLTV+] updating choices...');
 		if (!type || type === 'player') {
-			const playerRanking = await this.getPlayerRanking();
+			const playerRanking = await this.getCachedPlayerRanking().catch((e) => safelyError(e, 'get cached team ranking'));
 			this.#players = playerRanking
-				.map((entry) => ({
+				?.map((entry) => ({
 					name: entry.player.name,
 					value: entry.player.id,
 					ctx: [entry.player.name.toLowerCase()].concat(entry.teams.map((t) => t.name.toLowerCase()))
@@ -66,23 +70,21 @@ export default class HLTVPlus extends Hltv {
 				.filter((entry) => entry.value) as HLTVOptionChoice[];
 		}
 		if (!type || type === 'team') {
-			const teamRanking = await this.getTeamRanking();
+			const teamRanking = await this.getCachedTeamRanking().catch((e) => safelyError(e, 'get cached player ranking'));
 			this.#teams = teamRanking
-				.map((entry) => ({
+				?.map((entry) => ({
 					name: entry.team.name,
 					value: entry.team.id,
 					ctx: [entry.team.name.toLowerCase()]
 				}))
 				.filter((entry) => entry.value) as HLTVOptionChoice[];
 		}
-
 		this.handleDuplicateNames(type);
-
 		container.logger.info('[HLTV+] updated choices!');
-
 		if (type === 'player') return this.#players;
 		if (type === 'team') return this.#teams;
 	}
+
 	private async handleDuplicateNames(type?: 'player' | 'team') {
 		if (!type) {
 			this.handleDuplicateNames('team');
@@ -107,6 +109,18 @@ export default class HLTVPlus extends Hltv {
 				}
 			});
 		});
+	}
+
+	public async getCachedTeamRanking(force?: boolean) {
+		if (!force && this.teamRanking) return this.teamRanking;
+		this.teamRanking = (await this.getTeamRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		return this.teamRanking;
+	}
+
+	public async getCachedPlayerRanking(force?: boolean) {
+		if (!force && this.playerRanking) return this.playerRanking;
+		this.playerRanking = (await this.getPlayerRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		return this.playerRanking;
 	}
 
 	public async getCachedPlayer({ id }: { id: number }): Promise<FullPlayer | undefined> {
