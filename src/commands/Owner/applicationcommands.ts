@@ -33,7 +33,11 @@ export class ApplicationCommandsCommand extends Command {
 		const components = deepClone(paginatedMessage.response.components);
 		components.push(
 			new MessageActionRow().addComponents(
-				new MessageButton().setCustomId('commands/applicationcommands/delete').setEmoji('🗑️').setLabel('abort search').setStyle('DANGER')
+				new MessageButton()
+					.setCustomId('commands/applicationcommands/delete')
+					.setEmoji('🗑️')
+					.setLabel('delete applicationcommand')
+					.setStyle('DANGER')
 			)
 		);
 		const message = await paginatedMessage.response.edit({ components });
