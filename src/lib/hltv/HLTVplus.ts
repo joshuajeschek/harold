@@ -61,7 +61,7 @@ export default class HLTVPlus extends Hltv {
 				.map((entry) => ({
 					name: entry.player.name,
 					value: entry.player.id,
-					ctx: [entry.player.name].concat(entry.teams.map((t) => t.name))
+					ctx: [entry.player.name.toLowerCase()].concat(entry.teams.map((t) => t.name.toLowerCase()))
 				}))
 				.filter((entry) => entry.value) as HLTVOptionChoice[];
 		}
@@ -71,7 +71,7 @@ export default class HLTVPlus extends Hltv {
 				.map((entry) => ({
 					name: entry.team.name,
 					value: entry.team.id,
-					ctx: [entry.team.name]
+					ctx: [entry.team.name.toLowerCase()]
 				}))
 				.filter((entry) => entry.value) as HLTVOptionChoice[];
 		}

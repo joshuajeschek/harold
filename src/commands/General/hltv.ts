@@ -24,7 +24,7 @@ export class VoteCommand extends Command {
 		const subcommand = interaction.options.getSubcommand(true);
 		if (subcommand !== 'player' && subcommand !== 'team') return;
 
-		const input = interaction.options.get(subcommand)?.value?.toString();
+		const input = interaction.options.get(subcommand)?.value?.toString().toLowerCase();
 		const choices = deepClone(await this.container.hltv.getChoices(subcommand));
 		if (input)
 			choices.sort((a, b) => {
