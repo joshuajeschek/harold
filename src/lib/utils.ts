@@ -1,8 +1,10 @@
-import { fetch } from '@sapphire/fetch';
+import { fetch, FetchResultTypes } from '@sapphire/fetch';
 import { container } from '@sapphire/framework';
 import { isThenable } from '@sapphire/utilities';
 import { MessageAttachment, TextBasedChannel } from 'discord.js';
 import Vibrant from 'node-vibrant';
+import sharp from 'sharp';
+import randomUseragent from 'random-useragent';
 
 export const safelyError = (e: any, ctx: string) =>
 	container.logger.error(`${e.name} [${ctx}]: ${e.message}${e.cause ? `\n${e.cause}` : ''}${e.stack ? `\n${e.stack}` : ''}`);
@@ -23,6 +25,13 @@ export function getQuery(raw: string | string[] | undefined, def?: string): stri
 	if (!raw) return def;
 	if (typeof raw === 'string') return raw;
 	return raw.join();
+}
+
+export async function getPngUrl(url?: string) {
+	if (!url?.includes('.svg')) return url;
+	const fetched = await fetch(url, { headers: { 'User-Agent': randomUseragent.getRandom() } }, FetchResultTypes.Buffer);
+	const buffer = await sharp(fetched).toFormat('png').toBuffer();
+	return (await getImageUrl(buffer)) || undefined;
 }
 
 let imageChannel: TextBasedChannel;

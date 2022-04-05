@@ -8,10 +8,7 @@ import rankingplayers from './rankingplayers';
 import rankingteams from './rankingteams';
 import team from './team';
 import Pageres from 'pageres';
-import sharp from 'sharp';
-import randomUseragent from 'random-useragent';
-import { getAccentColor, getImageUrl, safelyError } from '../utils';
-import { fetch, FetchResultTypes } from '@sapphire/fetch';
+import { getAccentColor, getImageUrl, getPngUrl, safelyError } from '../utils';
 
 interface HLTVOptionChoice extends ApplicationCommandOptionChoice {
 	ctx: string[];
@@ -21,6 +18,12 @@ interface HLTVOptionChoice extends ApplicationCommandOptionChoice {
 interface FullTeamPlus extends FullTeam {
 	accentColor?: Promise<number | undefined>;
 	pngLogo?: Promise<string | undefined> | string;
+	lineup?: Promise<string | undefined> | string;
+	timestamp: Date;
+}
+
+interface FullPlayerPlus extends FullPlayer {
+	timestamp: Date;
 }
 
 type HltvAction = 'player' | 'team' | 'rankingplayers' | 'rankingteams';
@@ -28,15 +31,14 @@ type HltvAction = 'player' | 'team' | 'rankingplayers' | 'rankingteams';
 export default class HLTVPlus extends Hltv {
 	#players?: HLTVOptionChoice[];
 	#teams?: HLTVOptionChoice[];
-	teamRanking?: TeamRanking[];
-	playerRanking?: PlayerRanking[];
+	#teamRanking?: TeamRanking[];
+	#playerRanking?: PlayerRanking[];
 
 	// objects are cached for one day, expired elements are check every 10 minutes
 	#ttl = Time.Day / 1000;
 	#cache = {
 		players: new NodeCache({ stdTTL: this.#ttl }),
-		teams: new NodeCache({ stdTTL: this.#ttl }),
-		teamlineups: new NodeCache({ stdTTL: this.#ttl })
+		teams: new NodeCache({ stdTTL: this.#ttl })
 	};
 
 	public readonly actions = { player, team, rankingplayers, rankingteams };
@@ -112,56 +114,43 @@ export default class HLTVPlus extends Hltv {
 	}
 
 	public async getCachedTeamRanking(force?: boolean) {
-		if (!force && this.teamRanking) return this.teamRanking;
-		this.teamRanking = (await this.getTeamRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
-		return this.teamRanking;
+		if (!force && this.#teamRanking) return this.#teamRanking;
+		this.#teamRanking = (await this.getTeamRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		return this.#teamRanking;
 	}
 
 	public async getCachedPlayerRanking(force?: boolean) {
-		if (!force && this.playerRanking) return this.playerRanking;
-		this.playerRanking = (await this.getPlayerRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
-		return this.playerRanking;
+		if (!force && this.#playerRanking) return this.#playerRanking;
+		this.#playerRanking = (await this.getPlayerRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		return this.#playerRanking;
 	}
 
-	public async getCachedPlayer({ id }: { id: number }): Promise<FullPlayer | undefined> {
-		const cachedPlayer = this.#cache.players.get<FullPlayer>(id);
+	public async getCachedPlayer({ id }: { id: number }): Promise<FullPlayerPlus | undefined> {
+		const cachedPlayer = this.#cache.players.get<FullPlayerPlus>(id);
 		if (cachedPlayer) return cachedPlayer;
-		const player = await this.getPlayer({ id }).catch((e) => safelyError(e, 'get player'));
+		const player = (await this.getPlayer({ id }).catch((e) => safelyError(e, 'get player'))) as FullPlayerPlus | void;
 		if (!player) return;
-		this.#cache.players.set<FullPlayer>(id, player);
+		player.timestamp = new Date();
+		this.#cache.players.set<FullPlayerPlus>(id, player);
 		return player;
-	}
-
-	public async getPngUrl(url?: string) {
-		if (!url?.includes('.svg')) return url;
-		const fetched = await fetch(url, { headers: { 'User-Agent': randomUseragent.getRandom() } }, FetchResultTypes.Buffer);
-		const buffer = await sharp(fetched).toFormat('png').toBuffer();
-		return (await getImageUrl(buffer)) || undefined;
 	}
 
 	private playerSortOrder = [TeamPlayerType.Starter, TeamPlayerType.Coach, TeamPlayerType.Substitute, TeamPlayerType.Benched];
 	public async getCachedTeam({ id }: { id: number }): Promise<FullTeamPlus | undefined> {
 		const cachedTeam = this.#cache.teams.get<FullTeamPlus>(id);
 		if (cachedTeam) return cachedTeam;
-		const team: FullTeamPlus | void = await this.getTeam({ id }).catch((e) => safelyError(e, 'get team'));
+		const team = (await this.getTeam({ id }).catch((e) => safelyError(e, 'get team'))) as FullTeamPlus | void;
 		if (!team) return;
+		team.timestamp = new Date();
 		team.players.sort((a, b) => this.playerSortOrder.indexOf(a.type) - this.playerSortOrder.indexOf(b.type));
-		team.pngLogo = this.getPngUrl(team.logo);
+		team.pngLogo = getPngUrl(team.logo);
 		if (team.logo) team.accentColor = getAccentColor(team.pngLogo);
+		team.lineup = this.getLineup({ id });
 		this.#cache.teams.set<FullTeamPlus>(id, team);
 		return team;
 	}
 
-	public async getCachedLineup({ id }: { id: number }): Promise<string | null> {
-		const cachedTeamLineup = this.#cache.teamlineups.get<string>(id);
-		if (cachedTeamLineup) return cachedTeamLineup;
-		const player = await this.getLineup({ id });
-		// cache missed lineup for half an hour, after that retry will be possible
-		this.#cache.teamlineups.set<string | null>(id, player, player ? this.#ttl : Time.Hour / 2 / 1000);
-		return player;
-	}
-
-	public async getLineup({ id }: { id: number }): Promise<string | null> {
+	public async getLineup({ id }: { id: number }): Promise<string | undefined> {
 		const pageres = new Pageres({ scale: 4, transparent: true, timeout: 10 });
 		const selectors = [
 			'body > div.bgPadding > div.widthControl > div.colCon > div.contentCol > div > div.bodyshot-team-bg',
@@ -181,8 +170,8 @@ export default class HLTVPlus extends Hltv {
 					.catch((e) => safelyError(e, 'get linup secondary'))
 			)?.at(0);
 
-		if (!lineup) return null;
+		if (!lineup) return;
 
-		return getImageUrl(lineup);
+		return (await getImageUrl(lineup)) || undefined;
 	}
 }

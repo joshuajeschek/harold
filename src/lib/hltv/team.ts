@@ -44,7 +44,8 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 		.setURL(HLTVPlus.getUrl('team', team.name, team.id))
 		.setThumbnail(isThenable(team.pngLogo) ? container.hltv.TEAM_PLACEHOLDER_IMAGE : team.pngLogo ?? container.hltv.TEAM_PLACEHOLDER_IMAGE)
 		.setAuthor({ name: 'hltv.org', url: 'https://www.hltv.org', iconURL: 'https://www.hltv.org/img/static/TopSmallLogo2x.png' })
-		.addField(ce.csguy, description.join('\n') || '...', true);
+		.addField(ce.csguy, description.join('\n') || '...', true)
+		.setTimestamp(team.timestamp);
 
 	if (socials.length > 0) embed.addField('⠀', socials.join('\n'), true);
 	if (members.length > 0) embed.addField('MEMBERS', truncateArray(members, 1024, 1).join('\n'));
@@ -75,7 +76,7 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 
 	stopwatch.restart();
 
-	const lineup = await container.hltv.getCachedLineup(args);
+	const lineup = await team.lineup;
 	const accentColor = await team.accentColor;
 	const logo = await team.pngLogo;
 

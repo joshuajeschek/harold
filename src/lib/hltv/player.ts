@@ -65,7 +65,8 @@ export default async (interaction: CommandInteraction | ButtonInteraction, args:
 		.setURL(`https://www.hltv.org/player/${player.id}/${player.ign}`)
 		.setImage(player.image || container.hltv.PLAYER_PLACEHOLDER_IMAGE)
 		.setAuthor({ name: 'hltv.org', url: 'https://www.hltv.org', iconURL: 'https://www.hltv.org/img/static/TopSmallLogo2x.png' })
-		.addField(ce.csguy, description.join('\n') || '...', true);
+		.addField(ce.csguy, description.join('\n') || '...', true)
+		.setTimestamp(player.timestamp);
 
 	if (socials.length > 0) embed.addField('⠀', socials.join('\n'), true);
 	if (statistics.length > 0) embed.addField('STATISTICS', statistics.join('\n'));
