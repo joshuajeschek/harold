@@ -31,8 +31,8 @@ type HltvAction = 'player' | 'team' | 'rankingplayers' | 'rankingteams';
 export default class HLTVPlus extends Hltv {
 	#players?: HLTVOptionChoice[];
 	#teams?: HLTVOptionChoice[];
-	#teamRanking?: TeamRanking[];
-	#playerRanking?: PlayerRanking[];
+	#teamRanking?: { ranking?: TeamRanking[]; timestamp: Date };
+	#playerRanking?: { ranking?: PlayerRanking[]; timestamp: Date };
 
 	// objects are cached for one day, expired elements are check every 10 minutes
 	#ttl = Time.Day / 1000;
@@ -63,7 +63,7 @@ export default class HLTVPlus extends Hltv {
 		container.logger.info('[HLTV+] updating choices...');
 		if (!type || type === 'player') {
 			const playerRanking = await this.getCachedPlayerRanking().catch((e) => safelyError(e, 'get cached team ranking'));
-			this.#players = playerRanking
+			this.#players = playerRanking?.ranking
 				?.map((entry) => ({
 					name: entry.player.name,
 					value: entry.player.id,
@@ -73,7 +73,7 @@ export default class HLTVPlus extends Hltv {
 		}
 		if (!type || type === 'team') {
 			const teamRanking = await this.getCachedTeamRanking().catch((e) => safelyError(e, 'get cached player ranking'));
-			this.#teams = teamRanking
+			this.#teams = teamRanking?.ranking
 				?.map((entry) => ({
 					name: entry.team.name,
 					value: entry.team.id,
@@ -115,13 +115,22 @@ export default class HLTVPlus extends Hltv {
 
 	public async getCachedTeamRanking(force?: boolean) {
 		if (!force && this.#teamRanking) return this.#teamRanking;
-		this.#teamRanking = (await this.getTeamRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		this.#teamRanking = {
+			ranking: (await this.getTeamRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined,
+			timestamp: new Date()
+		};
 		return this.#teamRanking;
 	}
 
 	public async getCachedPlayerRanking(force?: boolean) {
 		if (!force && this.#playerRanking) return this.#playerRanking;
-		this.#playerRanking = (await this.getPlayerRanking().catch((e) => safelyError(e, 'get team ranking'))) ?? undefined;
+		const now = new Date();
+		const startDate = `${now.getFullYear() - 1}-${now.getMonth()}-${now.getDate()}`;
+		const endDate = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+		this.#playerRanking = {
+			ranking: (await this.getPlayerRanking({ startDate, endDate }).catch((e) => safelyError(e, 'get team ranking'))) ?? undefined,
+			timestamp: now
+		};
 		return this.#playerRanking;
 	}
 
