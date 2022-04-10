@@ -51,6 +51,13 @@ export class HaroldClient extends SapphireClient {
 						}
 					}
 				})
+			},
+			api: {
+				auth: {
+					id: process.env.DISCORD_APP_ID || '',
+					secret: process.env.DISCORD_SECRET || '',
+					scopes: ['identify']
+				}
 			}
 		});
 	}
