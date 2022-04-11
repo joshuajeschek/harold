@@ -2,42 +2,31 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { methods, Route, ApiRequest, ApiResponse, RouteOptions } from '@sapphire/plugin-api';
 import { randomUUID } from 'crypto';
 import NodeCache from 'node-cache';
-import { getQuery } from '../lib/utils';
-
-interface AuthData {
-	discordId?: string;
-	steamId?: string;
-}
+import { getQuery, isValidUserId } from '../lib/utils';
 
 @ApplyOptions<RouteOptions>({
 	route: '/auth'
 })
 export class AuthRoute extends Route {
-	#auth = new NodeCache({ stdTTL: 5 * 60 });
+	#discordIds = new NodeCache({ stdTTL: 5 * 60 });
 
 	public async [methods.GET](request: ApiRequest, response: ApiResponse) {
-		let authId = getQuery(request.query['authId']);
-		const discordId = getQuery(request.query['discordId']);
+		const authId = getQuery(request.query['authId'], randomUUID());
+		const discordId = getQuery(request.query['discordId']) || this.#discordIds.get<string>(authId);
 		const steamId = getQuery(request.query['steamId']);
 
-		if (authId && !this.#auth.has(authId)) return response.respond({ exists: false });
+		if (!discordId || !(await isValidUserId(discordId))) return response.respond({ success: false });
 
-		authId ||= randomUUID();
-
-		const authData = this.#auth.get<AuthData>(authId) || {};
-		authData.discordId ||= discordId;
-		authData.steamId ||= steamId;
-
-		if (authData.discordId && authData.steamId) {
-			const discordAvatar = (await this.container.client.users.fetch(authData.discordId)).displayAvatarURL({ format: 'png' });
+		if (discordId && steamId) {
+			const discordAvatar = (await this.container.client.users.fetch(discordId)).displayAvatarURL({ format: 'png' });
 			// TODO
 			// save to database and start befriending
-			this.#auth.del(authId);
-			return response.respond({ exists: true, discordAvatar });
+			this.#discordIds.del(authId);
+			return response.respond({ success: true, discordAvatar });
 		}
 
-		this.#auth.set<AuthData>(authId, authData);
+		this.#discordIds.set<string>(authId, discordId);
 
-		response.respond({ exists: true, authId });
+		response.respond({ success: true, authId });
 	}
 }

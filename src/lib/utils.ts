@@ -92,3 +92,11 @@ export function truncateArray(array: string[], maxSize: number, offset?: number)
 	while (array.reduce<number>((prev, curr) => prev + curr.length + (offset ?? 0), 0) > maxSize) array.pop();
 	return array;
 }
+
+export async function isValidUserId(id: string): Promise<boolean> {
+	try {
+		return !!(await container.client.users.fetch(id));
+	} catch {
+		return false;
+	}
+}
