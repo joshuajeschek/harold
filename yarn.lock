@@ -511,31 +511,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^3.10.0":
-  version: 3.11.1
-  resolution: "@prisma/client@npm:3.11.1"
+"@prisma/client@npm:^3.12.0":
+  version: 3.12.0
+  resolution: "@prisma/client@npm:3.12.0"
   dependencies:
-    "@prisma/engines-version": 3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9
+    "@prisma/engines-version": 3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980
   peerDependencies:
     prisma: "*"
   peerDependenciesMeta:
     prisma:
       optional: true
-  checksum: 8750495b80f1fe0e2a70e439b6c8b5912ca04e6ca8baa1bfed0750bdfe130d8e0d29600414471873fce8683a92b74a45a175d68ab662d8a4f877c59430163e4e
+  checksum: b342c6e771e671a49684f69a2cb27df1d5083fb97a55aa0d07db3e6ad5bf16e27ee566e528b97b1c501be2c46b98eb7577996e1be6e029910537538107eba471
   languageName: node
   linkType: hard
 
-"@prisma/engines-version@npm:3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9":
-  version: 3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9
-  resolution: "@prisma/engines-version@npm:3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9"
-  checksum: ae3b4caf41f316b61c6b7b607fd9466ce5d8ff798ecb6877899a5ae65a55a62d02b83d4639dc6f48900bdf79702b08ff441772367809e01762de1fb74fb731c6
+"@prisma/engines-version@npm:3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980":
+  version: 3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980
+  resolution: "@prisma/engines-version@npm:3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980"
+  checksum: e69f48def4b5761d594ebe7c87f04772fd03f2fb3cc2eacee92188b244d6c2d9aeff75be88d10bfd2a3c05b1da8d04d2a4d4a977b7a23671cc0617fb811b2855
   languageName: node
   linkType: hard
 
-"@prisma/engines@npm:3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9":
-  version: 3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9
-  resolution: "@prisma/engines@npm:3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9"
-  checksum: 87750ba42f2ad359e381818264acebc02d6e8fa61fe878c8e6e9ed2e0c2d13171e5c5e60ac9b380a9df54b6bc1c83750bbc6364ef09d8db7a613127f236a647b
+"@prisma/engines@npm:3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980":
+  version: 3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980
+  resolution: "@prisma/engines@npm:3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980"
+  checksum: 7f4dafe75ab5c47847ef3be72812ddc553944baf821600349bd023d11187245bc5c56a1df0b0a34b91ec5072627418690c20bf934c1e4242b388e6225bfa3604
   languageName: node
   linkType: hard
 
@@ -546,7 +546,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/decorators@npm:^4.0.2":
+"@sapphire/decorators@npm:^4.3.4":
   version: 4.3.4
   resolution: "@sapphire/decorators@npm:4.3.4"
   dependencies:
@@ -555,7 +555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/discord-utilities@npm:^2.10.3, @sapphire/discord-utilities@npm:^2.6.0":
+"@sapphire/discord-utilities@npm:^2.10.3":
   version: 2.10.3
   resolution: "@sapphire/discord-utilities@npm:2.10.3"
   dependencies:
@@ -564,7 +564,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/discord.js-utilities@npm:^4.4.0, @sapphire/discord.js-utilities@npm:^4.9.4":
+"@sapphire/discord.js-utilities@npm:^4.9.4":
   version: 4.9.4
   resolution: "@sapphire/discord.js-utilities@npm:4.9.4"
   dependencies:
@@ -576,7 +576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/fetch@npm:^2.0.4":
+"@sapphire/fetch@npm:^2.3.1":
   version: 2.3.1
   resolution: "@sapphire/fetch@npm:2.3.1"
   dependencies:
@@ -586,8 +586,8 @@ __metadata:
   linkType: hard
 
 "@sapphire/framework@npm:next":
-  version: 3.0.0-next.379f5db.0
-  resolution: "@sapphire/framework@npm:3.0.0-next.379f5db.0"
+  version: 3.0.0-next.5f07004.0
+  resolution: "@sapphire/framework@npm:3.0.0-next.5f07004.0"
   dependencies:
     "@sapphire/discord-utilities": ^2.10.3
     "@sapphire/discord.js-utilities": ^4.9.4
@@ -598,7 +598,7 @@ __metadata:
     "@sapphire/utilities": ^3.6.2
     lexure: ^0.17.0
     tslib: ^2.3.1
-  checksum: 6188d5e706a150db51def7bbe184d8db586e2a0da1b6bca16590b7bb0340a2c28a829650620d8fc25fc70d47b2984a244a4b6aacb5bf0d2b8dc98921a30cdc72
+  checksum: 6f87ec54bf8d4db0e1ad5a57d61fdf3a59028261d2ed8c90a67837cda963fe290837111d5f2c1edbfff85ea75bdcfffa73df5f5e7ea0007a53a398ece6faa223
   languageName: node
   linkType: hard
 
@@ -613,7 +613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/plugin-api@npm:^3.1.3":
+"@sapphire/plugin-api@npm:^3.2.1":
   version: 3.2.1
   resolution: "@sapphire/plugin-api@npm:3.2.1"
   dependencies:
@@ -647,7 +647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/plugin-logger@npm:^2.1.2":
+"@sapphire/plugin-logger@npm:^2.2.1":
   version: 2.2.1
   resolution: "@sapphire/plugin-logger@npm:2.2.1"
   dependencies:
@@ -668,7 +668,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/prettier-config@npm:^1.2.9":
+"@sapphire/prettier-config@npm:^1.4.2":
   version: 1.4.2
   resolution: "@sapphire/prettier-config@npm:1.4.2"
   dependencies:
@@ -702,7 +702,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/time-utilities@npm:^1.5.2, @sapphire/time-utilities@npm:^1.7.3, @sapphire/time-utilities@npm:^1.7.4":
+"@sapphire/time-utilities@npm:^1.7.3, @sapphire/time-utilities@npm:^1.7.4":
   version: 1.7.4
   resolution: "@sapphire/time-utilities@npm:1.7.4"
   dependencies:
@@ -711,7 +711,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/ts-config@npm:^3.1.8":
+"@sapphire/ts-config@npm:^3.3.4":
   version: 3.3.4
   resolution: "@sapphire/ts-config@npm:3.3.4"
   dependencies:
@@ -721,7 +721,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/type@npm:^2.1.2":
+"@sapphire/type@npm:^2.2.0":
   version: 2.2.0
   resolution: "@sapphire/type@npm:2.2.0"
   dependencies:
@@ -732,7 +732,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:^3.2.1, @sapphire/utilities@npm:^3.6.2":
+"@sapphire/utilities@npm:^3.6.2":
   version: 3.6.2
   resolution: "@sapphire/utilities@npm:3.6.2"
   checksum: 71210753b446f3f2835dd9d28fb10767f4c6f005b465eea179082d9f2c071acb7dcd2aebdf7c4974b26aad3ab2374a1dd168a66371b06bd65f248bbca4a90cda
@@ -795,7 +795,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4":
+"@types/lodash@npm:^4.14.181":
   version: 4.14.181
   resolution: "@types/lodash@npm:4.14.181"
   checksum: 0d1863d8383fd2f8bb42e9e3fc1d6255bb88ff034d6df848941063698944313dae944fc1270315613e3d303fae7c7a9a86085ad3235ed6204c56c4b0b3699aa9
@@ -812,7 +812,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^17.0.10":
+"@types/node@npm:*, @types/node@npm:^17.0.23":
   version: 17.0.23
   resolution: "@types/node@npm:17.0.23"
   checksum: a3517554737cbb042e76c30d0e5482192ac4d9bea0eeb086e2622d9cabf460a0eb52a696b99fcd18e7fcc93c96db6cc7ae507f6608f256ef0b5c1d8c87a5a470
@@ -849,7 +849,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/random-useragent@npm:^0":
+"@types/random-useragent@npm:^0.3.1":
   version: 0.3.1
   resolution: "@types/random-useragent@npm:0.3.1"
   checksum: 33edc7fe3be6b4e6a58a9ab1f109062fa70ec32be087feccb46e87b19db6c75c0067eff7e7da7caaaff0ae22da97268a84941684d23b1f50feb14d77e0ab4e8a
@@ -874,19 +874,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sharp@npm:^0":
+"@types/sharp@npm:^0.30.1":
   version: 0.30.1
   resolution: "@types/sharp@npm:0.30.1"
   dependencies:
     "@types/node": "*"
   checksum: cb085ca7456caf20b9f787fd43d910976fa6d0cd951109e51636160083f23cc8798c5a01ab56058861edabd1acd00950b1e2bb8dc954355f73270cf1d1aa3534
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^8":
-  version: 8.3.4
-  resolution: "@types/uuid@npm:8.3.4"
-  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 
@@ -2053,7 +2046,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^5.0.0":
+"dotenv-cli@npm:^5.1.0":
   version: 5.1.0
   resolution: "dotenv-cli@npm:5.1.0"
   dependencies:
@@ -2751,35 +2744,34 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "harold@workspace:."
   dependencies:
-    "@discordjs/collection": ^0.4.0
-    "@prisma/client": ^3.10.0
-    "@sapphire/decorators": ^4.0.2
-    "@sapphire/discord-utilities": ^2.6.0
-    "@sapphire/discord.js-utilities": ^4.4.0
-    "@sapphire/fetch": ^2.0.4
+    "@discordjs/collection": ^0.5.0
+    "@prisma/client": ^3.12.0
+    "@sapphire/decorators": ^4.3.4
+    "@sapphire/discord-utilities": ^2.10.3
+    "@sapphire/discord.js-utilities": ^4.9.4
+    "@sapphire/fetch": ^2.3.1
     "@sapphire/framework": next
-    "@sapphire/plugin-api": ^3.1.3
+    "@sapphire/plugin-api": ^3.2.1
     "@sapphire/plugin-editable-commands": ^1.2.0
     "@sapphire/plugin-hmr": ^1.2.0
-    "@sapphire/plugin-logger": ^2.1.2
+    "@sapphire/plugin-logger": ^2.2.1
     "@sapphire/plugin-scheduled-tasks": ^2.3.2
-    "@sapphire/prettier-config": ^1.2.9
+    "@sapphire/prettier-config": ^1.4.2
     "@sapphire/stopwatch": ^1.4.1
-    "@sapphire/time-utilities": ^1.5.2
-    "@sapphire/ts-config": ^3.1.8
-    "@sapphire/type": ^2.1.2
-    "@sapphire/utilities": ^3.2.1
+    "@sapphire/time-utilities": ^1.7.4
+    "@sapphire/ts-config": ^3.3.4
+    "@sapphire/type": ^2.2.0
+    "@sapphire/utilities": ^3.6.2
     "@types/bull": ^3.15.8
     "@types/js-levenshtein": ^1.1.1
-    "@types/lodash": ^4
-    "@types/node": ^17.0.10
-    "@types/random-useragent": ^0
-    "@types/sharp": ^0
-    "@types/uuid": ^8
-    "@types/ws": ^8.2.2
+    "@types/lodash": ^4.14.181
+    "@types/node": ^17.0.23
+    "@types/random-useragent": ^0.3.1
+    "@types/sharp": ^0.30.1
+    "@types/ws": ^8.5.3
     bull: ^4.8.1
     discord.js: ^13.6.0
-    dotenv-cli: ^5.0.0
+    dotenv-cli: ^5.1.0
     dotenv-cra: ^3.0.2
     hltv: ^3.4.0
     husky: ^7.0.4
@@ -2790,15 +2782,14 @@ __metadata:
     node-vibrant: ^3.2.1-alpha.1
     npm-run-all: ^4.1.5
     pageres: ^6.3.1
-    prettier: ^2.5.1
-    prisma: ^3.10.0
+    prettier: ^2.6.2
+    prisma: ^3.12.0
     random-useragent: ^0.5.0
     reflect-metadata: ^0.1.13
     sharp: ^0.30.3
-    systeminformation: ^5.11.6
-    tsc-watch: ^4.6.0
+    systeminformation: ^5.11.9
+    tsc-watch: ^5.0.3
     typescript: ^4.6.3
-    uuid: latest
   languageName: unknown
   linkType: soft
 
@@ -4689,7 +4680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.5.1, prettier@npm:^2.6.1":
+"prettier@npm:^2.6.1, prettier@npm:^2.6.2":
   version: 2.6.2
   resolution: "prettier@npm:2.6.2"
   bin:
@@ -4698,15 +4689,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^3.10.0":
-  version: 3.11.1
-  resolution: "prisma@npm:3.11.1"
+"prisma@npm:^3.12.0":
+  version: 3.12.0
+  resolution: "prisma@npm:3.12.0"
   dependencies:
-    "@prisma/engines": 3.11.1-1.1a2506facaf1a4727b7c26850735e88ec779dee9
+    "@prisma/engines": 3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980
   bin:
     prisma: build/index.js
     prisma2: build/index.js
-  checksum: 0dc24dad3b71ece4b5de69451f90bce20b3d52cd4b17626a725536daef0db07ee2bb08d4e50aa49332bd0b3a19a9e34bd230551bb0c859acea34f1aa508f17bd
+  checksum: ac4aefdaa7af285686fcdfb9060f65a650ef4576000718c7c53372326f631ca5a5649ed10398db89952c63b2c6fbcd227e38de59a6e69f9dcb746fac680da650
   languageName: node
   linkType: hard
 
@@ -5553,7 +5544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:^5.11.6":
+"systeminformation@npm:^5.11.9":
   version: 5.11.9
   resolution: "systeminformation@npm:5.11.9"
   bin:
@@ -5697,9 +5688,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:^4.6.0":
-  version: 4.6.2
-  resolution: "tsc-watch@npm:4.6.2"
+"tsc-watch@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "tsc-watch@npm:5.0.3"
   dependencies:
     cross-spawn: ^7.0.3
     node-cleanup: ^2.1.2
@@ -5710,7 +5701,7 @@ __metadata:
     typescript: "*"
   bin:
     tsc-watch: index.js
-  checksum: 36cf74d45c7c32d2db70f784d153d36c5a010d0d9e138a835c6e7d804a8593f6784688a64deb818e74f84c622c4b73695d1380630e7b24a24ca7d96aeeea5ea5
+  checksum: abd63295dd5fda098a45d27912031e6c35a95f1aa20d7a86d6ad1469580400069e6476f2ffd4b88e37886d016443e60b1ae2dbcaf756e324efc67d0fa713fb15
   languageName: node
   linkType: hard
 
@@ -5872,7 +5863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:8.3.2, uuid@npm:^8.3.0, uuid@npm:latest":
+"uuid@npm:8.3.2, uuid@npm:^8.3.0":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:
