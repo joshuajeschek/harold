@@ -5,9 +5,9 @@ const client = new HaroldClient();
 
 const main = async () => {
 	try {
-		client.logger.info('Logging in');
+		client.logger.info('[DISCORD] Logging in');
 		await client.login();
-		client.logger.info('logged in');
+		client.logger.info('[DISCORD] Logged in');
 	} catch (error) {
 		client.logger.fatal(error);
 		client.destroy();

@@ -4,6 +4,7 @@
         "routes",
         "db",
         "resources",
-        "tasks"
+        "tasks",
+        "steam"
     ]
 }

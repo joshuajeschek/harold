@@ -18,3 +18,8 @@ model User {
   id               String @db.VarChar(64) @id @unique
   wantsNewsletter  Boolean
 }
+
+model SteamAccount {
+  name            String @id @unique
+  password        String
+}

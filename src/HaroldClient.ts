@@ -6,6 +6,7 @@ import type { Message } from 'discord.js';
 import type HltvPlus from './lib/hltv/HLTVplus';
 import HLTVplus from './lib/hltv/HLTVplus';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
+import Steam from './lib/steam/Steam';
 
 export class HaroldClient extends SapphireClient {
 	public constructor() {
@@ -63,10 +64,9 @@ export class HaroldClient extends SapphireClient {
 	}
 
 	public override async login(token?: string) {
-		const db = new PrismaClient();
-		this.logger.info('connected to database');
-		container.db = db;
+		container.db = new PrismaClient();
 		container.hltv = new HLTVplus({ fetchChoices: process.env.NODE_ENV !== 'development' });
+		container.steam = new Steam();
 		return super.login(token);
 	}
 
@@ -96,5 +96,6 @@ declare module '@sapphire/pieces' {
 	interface Container {
 		db: PrismaClient;
 		hltv: HltvPlus;
+		steam: Steam;
 	}
 }
