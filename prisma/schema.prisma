@@ -8,18 +8,23 @@ datasource db {
 }
 
 model Guild {
-  id              String @db.VarChar(64) @id @unique
-  prefix          String @db.VarChar(255) @default(dbgenerated("'!'"))
-  voteTime        Float @default(dbgenerated("5"))
-  voteCount       Int   @default(dbgenerated("4"))
+  id               String @db.VarChar(64) @id @unique
+  prefix           String @db.VarChar(255) @default(dbgenerated("'!'"))
+  voteTime         Float @default(dbgenerated("5"))
+  voteCount        Int   @default(dbgenerated("4"))
 }
 
 model User {
   id               String @db.VarChar(64) @id @unique
-  wantsNewsletter  Boolean
+  wantsNewsletter  Boolean @default(false)
+  steamID          String?
+  befriended       Boolean?
+  steamFriendName  String?
+  steamFriend      SteamAccount? @relation(fields: [steamFriendName], references: [name])
 }
 
 model SteamAccount {
-  name            String @id @unique
-  password        String
+  name             String @id @unique
+  password         String
+  users            User[]
 }
