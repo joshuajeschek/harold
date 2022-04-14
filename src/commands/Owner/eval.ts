@@ -45,7 +45,7 @@ export class EvalCommand extends Command {
 
 		const { result, success, type } = await this.eval(interaction, code, {
 			async: interaction.options.getBoolean('async') ?? false,
-			depth: Number(interaction.options.getNumber('depth')) ?? 0,
+			depth: interaction.options.getInteger('depth') ?? 0,
 			showHidden: interaction.options.getBoolean('showHidden') ?? false
 		});
 
