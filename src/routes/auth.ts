@@ -34,6 +34,7 @@ export class AuthRoute extends Route {
 	private async addFriend(discordID: string, steamID: string) {
 		await this.container.db.user.upsert({ where: { id: discordID }, create: { id: discordID, steamID }, update: { steamID } });
 		const res = await this.container.steam.addFriend(steamID);
+		if (!res.error) return;
 		switch (res.error) {
 			case AddFriendError.Blocked:
 				return (await this.container.client.users.createDM(discordID)).send(
@@ -45,8 +46,10 @@ export class AuthRoute extends Route {
 				);
 			case AddFriendError.DuplicateName:
 				return this.container.db.user.update({ where: { id: discordID }, data: { befriended: true, steamFriendName: res.accountName } });
-			default: // no error
-				return;
+			default: // unknown error
+				return (await this.container.client.users.createDM(discordID)).send(
+					`An unknown error occured while befriending you: Error code: ${res.error}.`
+				);
 		}
 	}
 }

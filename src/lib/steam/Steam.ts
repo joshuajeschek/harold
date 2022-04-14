@@ -23,7 +23,7 @@ type AddFriendResult = { accountName: string; error?: AddFriendError };
 const MAX_FRIENDS = 250;
 
 export class Steam {
-	#users = new Collection<string, GlobalOffensiveUser>();
+	readonly users = new Collection<string, GlobalOffensiveUser>();
 
 	constructor() {
 		this.logOn();
@@ -37,7 +37,7 @@ export class Steam {
 			const user = new SteamUser();
 			const csgo = new GlobalOffensive(user);
 			const globalOffensiveUser = { user, csgo, friends: MAX_FRIENDS };
-			this.#users.set(account.name, globalOffensiveUser);
+			this.users.set(account.name, globalOffensiveUser);
 			// LISTENERS
 			user.on('loggedOn', () => this.loggedOn(user, account.name));
 			user.on('friendsList', () => this.friendsList(account.name));
@@ -54,16 +54,19 @@ export class Steam {
 		// 	(prev, curr, name) => (curr.friends < (prev.friends || MAX_FRIENDS) ? { name, ...curr } : prev),
 		// 	{ friends: MAX_FRIENDS, name: '' }
 		// );
-		const possibleUsers = this.#users.filter((user) => user.friends < MAX_FRIENDS).sort((a, b) => a.friends - b.friends);
+		const possibleUsers = this.users.filter((user) => user.friends < MAX_FRIENDS).sort((a, b) => a.friends - b.friends);
 		let res: AddFriendResult = { accountName: '', error: AddFriendError.SlotShortage };
 		while (possibleUsers.size > 0) {
+			// get first item in possibleUsers "stack"
 			const accountName = possibleUsers.firstKey()!;
 			const user = possibleUsers.first()!.user;
 			res = await user
 				.addFriend(steamID)
 				.then(() => ({ accountName }))
 				.catch(({ eresult: error }: Error & { eresult: AddFriendError.Blocked | AddFriendError.DuplicateName }) => ({ error, accountName }));
-			if (res.error !== AddFriendError.Blocked) return res;
+			if (res.error === AddFriendError.DuplicateName) return res;
+			// delete from top of possibleUsers "stack"
+			possibleUsers.delete(accountName);
 		}
 		return res;
 	}
@@ -86,7 +89,7 @@ export class Steam {
 	};
 
 	private friendsList = (name: string) => {
-		const globalOffensiveUser = this.#users.get(name);
+		const globalOffensiveUser = this.users.get(name);
 		if (!globalOffensiveUser) return;
 		globalOffensiveUser.friends = this.countFriends(globalOffensiveUser.user);
 	};
@@ -110,7 +113,12 @@ export class Steam {
 		}
 		if (relationship === SteamUser.EFriendRelationship.Blocked || relationship === SteamUser.EFriendRelationship.None) {
 			container.logger.info(`[STEAM](${name}) UNfriend: ${steamID.getSteamID64()}`);
-			container.db.user.updateMany({ where: { steamID: steamID.getSteamID64() }, data: { befriended: false, steamFriendName: null } });
+			container.db.user
+				.updateMany({
+					where: { steamID: steamID.getSteamID64(), steamFriendName: name },
+					data: { befriended: false, steamFriendName: null }
+				})
+				.catch((e) => safelyError(e, 'unfriending in database'));
 		}
 		if (relationship === SteamUser.EFriendRelationship.RequestRecipient) {
 			container.logger.info(`[STEAM](${name}) request: ${steamID.getSteamID64()}`);
